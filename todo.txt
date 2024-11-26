@@ -1,0 +1,23 @@
+TODO
+
+- Setup tailwind color palette (Base sa Sample UI image)
+
+ === COMPONENTS ===
+- Input field
+- Buttons: Black, Green, Red buttons ( default, outline, link )
+- Movies Cards
+    -> Upcoming Movies
+    -> Now Showing Movies
+- Toasts (Green, Red / Success and Danger)
+- Charts
+- Modals
+
+== TASK ==
+
+- Login Page
+- Admin Dashboard
+    -> Side bar (Submenu toggle)
+    -> Main bar
+
+- Responsiveness
+    
