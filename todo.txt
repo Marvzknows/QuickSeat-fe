@@ -1,4 +1,5 @@
 TODO
+COLOR PALLETE THEME: https://colorhunt.co/palette/040d12183d3d5c837493b1a6
 
 - Setup tailwind color palette (Base sa Sample UI image)
 
@@ -14,7 +15,10 @@ TODO
 
 == TASK ==
 
-- Login Page
+- Login Page ( UI and Functionality )
+- Handling Access token (React cookie)
+- Install and setup Redux
+- Implement Protected Routes
 - Admin Dashboard
     -> Side bar (Submenu toggle)
     -> Main bar
