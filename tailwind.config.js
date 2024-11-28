@@ -8,7 +8,9 @@ export default {
     extend: {
       colors: {
         primary: '#040D12', // Black (buttons)
-        secondary: '#F1F1F1' // for backgrounds
+        secondary: '#F1F1F1', // for backgrounds
+        danger: '#dc2626',
+        success: '#65a30d'
       }
     },
   },
