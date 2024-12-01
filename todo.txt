@@ -15,13 +15,14 @@ COLOR PALLETE THEME: https://colorhunt.co/palette/040d12183d3d5c837493b1a6
 
 == TASK ==
 
-- Login Page ( UI and Functionality )
+- **DONE** Login Page ( UI and Functionality )
 - Handling Access token (React cookie)
 - Install and setup Redux
 - Implement Protected Routes
 - Admin Dashboard
-    -> Side bar (Submenu toggle)
-    -> Main bar
+    -> **DONE** Side bar (Submenu toggle)
+    -> Toggle Sidebar
+    -> **DONE** Main bar
 
 - Responsiveness
     

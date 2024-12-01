@@ -38,7 +38,7 @@ const Login = () => {
 
   return (
     <>
-      <div className="min-h-screen border-8 border-slate-700 h-screen flex flex-col justify-center items-center bg-secondary">
+      <div className="min-h-screen h-screen flex flex-col justify-center items-center bg-secondary">
         <div className="flex flex-col items-center w-80 max-w-screen-lg lg:w-[22%] bg-white rounded-lg p-3 shadow-lg">
           <h2 className="block antialiased tracking-normal font-sans text-4xl text-inherit font-bold mb-4">
             Sign In
