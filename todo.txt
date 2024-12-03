@@ -21,7 +21,7 @@ COLOR PALLETE THEME: https://colorhunt.co/palette/040d12183d3d5c837493b1a6
 - Implement Protected Routes
 - Admin Dashboard
     -> **DONE** Side bar (Submenu toggle)
-    -> Toggle Sidebar
+    -> **DONE** Toggle Sidebar
     -> **DONE** Main bar
 
 - Responsiveness

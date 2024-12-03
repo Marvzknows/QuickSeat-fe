@@ -6,39 +6,43 @@ import UpcomingShow from './pages/Admin/Movies/UpcomingShow'
 import ProtectedRoute from './pages/Layout/AdminLayout/AdminProtectedRoute'
 import AdminLayout from './pages/Layout/AdminLayout/AdminLayout'
 import NowShowing from './pages/Admin/Movies/NowShowing'
+import ContextProvider from './assets/context/contextApi'
 
 function App() {
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<Login />} />
+    <ContextProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
 
-        {/* ADMIN ROUTES */}
-        <Route> 
-          <Route path='/admin' element={<ProtectedRoute />}> {/* Add a protected route here as an element */}
-            {/* Admin Layout */}
-            <Route element={<AdminLayout />}>
-              <Route path='dashboard' element={<AdminDashboard />} />
-              <Route path='upcoming' element={<UpcomingShow />} />
-              <Route path='nowshowing' element={<NowShowing />} />
+          {/* ADMIN ROUTES */}
+          <Route>
+            <Route path="/admin" element={<ProtectedRoute />}>
+              {" "}
+              {/* Add a protected route here as an element */}
+              {/* Admin Layout */}
+              <Route element={<AdminLayout />}>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="upcoming" element={<UpcomingShow />} />
+                <Route path="nowshowing" element={<NowShowing />} />
+              </Route>
             </Route>
           </Route>
-        </Route>
 
-        {/* USER ROUTES */}
-        
-        {/* <Route> 
+          {/* USER ROUTES */}
+
+          {/* <Route> 
           <Route path='/user' element={<UserProtectedRoute />}>
             <Route element={<UserLayout />}>
               <Route path='home' element={<Home />} />
             </Route>
           </Route>
         </Route> */}
-
-      </Routes>
-    </BrowserRouter>
-  )
+        </Routes>
+      </BrowserRouter>
+    </ContextProvider>
+  );
 }
 
 export default App
