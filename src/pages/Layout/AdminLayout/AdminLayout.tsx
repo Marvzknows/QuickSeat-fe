@@ -76,7 +76,7 @@ const AdminLayout = () => {
           {isShowDropdown && (
             <div
               ref={dropdownRef}
-              className="absolute top-12 right-0 w-60 bg-white shadow-lg border border-slate-100 p-2 rounded"
+              className="absolute top-12 right-0 w-60 bg-white shadow-lg border border-slate-100 p-2 rounded z-10"
             >
               <ul className="flex flex-col justify-around space-y-1 text-base h-full">
                 <li
