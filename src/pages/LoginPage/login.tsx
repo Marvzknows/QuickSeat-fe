@@ -14,10 +14,10 @@ const Login = () => {
 
   const HandleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { username, password } = credentials
-    if(!username.trim() || !password.trim()) {
-        toast.error("Please fill in all fields");
-        return;
+    const { username, password } = credentials;
+    if (!username.trim() || !password.trim()) {
+      toast.error("Please fill in all fields");
+      return;
     }
 
     console.table(credentials);
@@ -47,7 +47,10 @@ const Login = () => {
             Enter your credentials to sign in
           </p>
 
-          <form onSubmit={HandleOnSubmit} className="flex flex-col mt-8 mb-2 w-full">
+          <form
+            onSubmit={HandleOnSubmit}
+            className="flex flex-col mt-8 mb-2 w-full"
+          >
             <InputField
               onChange={HandleCredentials}
               name="username"

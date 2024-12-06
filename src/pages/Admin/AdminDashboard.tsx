@@ -7,7 +7,10 @@ import SectionHeader from "../../components/Headers/AdminHeaders";
 
 const ListButton = ({ text, onChangeHandler, isActive }: ListButtonProps) => {
   return (
-    <div onClick={() => onChangeHandler(text)} className={`w-full ${isActive ? 'border-b-2 border-slate-800 shadow text-slate-900' : 'text-slate-500'} transition-all ease-in p-2.5 font-medium  rounded-sm shadow bg-secondary cursor-pointer hover:bg-slate-100 hover:text-slate-600`}>
+    <div
+      onClick={() => onChangeHandler(text)}
+      className={`w-full ${isActive ? "border-b-2 border-slate-800 shadow text-slate-900" : "text-slate-500"} transition-all ease-in p-2.5 font-medium  rounded-sm shadow bg-secondary cursor-pointer hover:bg-slate-100 hover:text-slate-600`}
+    >
       {text}
     </div>
   );
@@ -16,23 +19,27 @@ const ListButton = ({ text, onChangeHandler, isActive }: ListButtonProps) => {
 const AdminDashboard = () => {
   const [activeList, setActiveList] = useState({
     nowShowing: true,
-    upcoming: false
-  })
+    upcoming: false,
+  });
 
-  const data = [2,2,45,253,256,246,24,63,46,374,535,73,7345,7,458,4,68,4846,845,68,48,456,895,965,95,9,65,95,679,5769,579,5,9];
+  const data = [
+    2, 2, 45, 253, 256, 246, 24, 63, 46, 374, 535, 73, 7345, 7, 458, 4, 68,
+    4846, 845, 68, 48, 456, 895, 965, 95, 9, 65, 95, 679, 5769, 579, 5, 9,
+  ];
 
-  const movieBannerLink = 'https://marketplace.canva.com/EAFVCFkAg3w/1/0/1131w/canva-red-and-black-horror-movie-poster-AOBSIAmLWOs.jpg';
+  const movieBannerLink =
+    "https://marketplace.canva.com/EAFVCFkAg3w/1/0/1131w/canva-red-and-black-horror-movie-poster-AOBSIAmLWOs.jpg";
 
   const HandleOnchangeList = (tabName: string) => {
     setActiveList({
-      nowShowing: tabName === 'nowShowing',
-      upcoming: tabName === 'upcoming',
+      nowShowing: tabName === "nowShowing",
+      upcoming: tabName === "upcoming",
     });
   };
 
   return (
     <AdminContainer>
-      <SectionHeader children={'Admin'} currentPage={"Dashboard"} />
+      <SectionHeader children={"Admin"} currentPage={"Dashboard"} />
 
       <div className="flex flex-col md:flex-row gap-2">
         <div className="w-full md:w-[60%] md:min-h-[500px] flex flex-col justify-center items-center bg-white rounded-lg shadow border border-neutral-200">
@@ -76,13 +83,20 @@ const AdminDashboard = () => {
                     Rating: <span className="text-success font-bold">PG</span>
                   </p>
                   <p className="text-slate-500">
-                    Duration: 
-                    <span className="text-slate-800 font-bold px-1">145mins</span>
+                    Duration:
+                    <span className="text-slate-800 font-bold px-1">
+                      145mins
+                    </span>
                   </p>
                 </div>
 
                 <div className="ml-auto my-auto pr-4">
-                  <p className="text-slate-500">Ticket Sold: <span className="text-slate-800 font-bold px-1">₱1,400.00</span></p>
+                  <p className="text-slate-500">
+                    Ticket Sold:{" "}
+                    <span className="text-slate-800 font-bold px-1">
+                      ₱1,400.00
+                    </span>
+                  </p>
                 </div>
               </div>
             ))}

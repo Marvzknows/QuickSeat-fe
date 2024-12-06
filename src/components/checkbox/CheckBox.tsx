@@ -1,7 +1,7 @@
 import { InputHTMLAttributes } from "react";
 
 type CheckboxTypes = InputHTMLAttributes<HTMLInputElement> & {
-  label?: string; 
+  label?: string;
   className?: string;
 };
 

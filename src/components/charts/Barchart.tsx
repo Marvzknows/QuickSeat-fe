@@ -33,15 +33,15 @@ const AdminBarChart = () => {
       revenue: 8000,
     },
     {
-        movieName: "The Flash",
-        ticketSold: 100,
-        revenue: 3000,
-      },
-      {
-        movieName: "Breaking Bad",
-        ticketSold: 400,
-        revenue: 6000,
-      },
+      movieName: "The Flash",
+      ticketSold: 100,
+      revenue: 3000,
+    },
+    {
+      movieName: "Breaking Bad",
+      ticketSold: 400,
+      revenue: 6000,
+    },
   ];
 
   // Custom Tooltip Component
@@ -51,7 +51,9 @@ const AdminBarChart = () => {
         <div className="bg-white shadow-md p-2 rounded">
           <p className="font-bold">{label}</p>
           <p className="text-gray-600">Tickets Sold: {payload[0].value}</p>
-          <p className="text-gray-600">Revenue: ₱{payload[1].value.toLocaleString()}</p>
+          <p className="text-gray-600">
+            Revenue: ₱{payload[1].value.toLocaleString()}
+          </p>
         </div>
       );
     }

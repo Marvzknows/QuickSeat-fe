@@ -1,15 +1,14 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import './App.css'
-import Login from './pages/LoginPage/login'
-import AdminDashboard from './pages/Admin/AdminDashboard'
-import UpcomingShow from './pages/Admin/Movies/UpcomingShow'
-import ProtectedRoute from './pages/Layout/AdminLayout/AdminProtectedRoute'
-import AdminLayout from './pages/Layout/AdminLayout/AdminLayout'
-import NowShowing from './pages/Admin/Movies/NowShowing'
-import ContextProvider from './assets/context/contextApi'
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import "./App.css";
+import Login from "./pages/LoginPage/login";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import UpcomingShow from "./pages/Admin/Movies/UpcomingShow";
+import ProtectedRoute from "./pages/Layout/AdminLayout/AdminProtectedRoute";
+import AdminLayout from "./pages/Layout/AdminLayout/AdminLayout";
+import NowShowing from "./pages/Admin/Movies/NowShowing";
+import ContextProvider from "./assets/context/contextApi";
 
 function App() {
-
   return (
     <ContextProvider>
       <BrowserRouter>
@@ -45,4 +44,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

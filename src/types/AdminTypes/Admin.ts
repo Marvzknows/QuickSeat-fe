@@ -1,5 +1,5 @@
 export type ListButtonProps = {
-    text: string;
-    onChangeHandler: (tabName: string) => void;
-    isActive: boolean;
+  text: string;
+  onChangeHandler: (tabName: string) => void;
+  isActive: boolean;
 };

@@ -6,9 +6,9 @@ import { HiMiniViewfinderCircle } from "react-icons/hi2";
 import { AiFillDelete } from "react-icons/ai";
 
 const UpcomingShow = () => {
+  const movieBannerLink =
+    "https://marketplace.canva.com/EAFVCFkAg3w/1/0/1131w/canva-red-and-black-horror-movie-poster-AOBSIAmLWOs.jpg";
 
-    const movieBannerLink = 'https://marketplace.canva.com/EAFVCFkAg3w/1/0/1131w/canva-red-and-black-horror-movie-poster-AOBSIAmLWOs.jpg';
-    
   return (
     <AdminContainer>
       <SectionHeader
@@ -75,17 +75,16 @@ const UpcomingShow = () => {
                   </td>
                   <td className="px-6 py-4">
                     <button className="px-2 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 mr-1 fontb-bold">
-                        <MdEdit size={20} />
+                      <MdEdit size={20} />
                     </button>
                     <button className="px-2 py-1 bg-green-700 text-white rounded hover:bg-green-800 mr-1 fontb-bold">
-                        <HiMiniViewfinderCircle  size={20} />
+                      <HiMiniViewfinderCircle size={20} />
                     </button>
                     <button className="px-2 py-1 bg-red-700 text-white rounded hover:bg-red-800 mr-1 fontb-bold">
-                        <AiFillDelete   size={20} />
+                      <AiFillDelete size={20} />
                     </button>
                   </td>
                 </tr>
-                
               </tbody>
             </table>
           </div>
