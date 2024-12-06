@@ -24,7 +24,7 @@ const SideBar = () => {
       link: '',
       icon: <RiMovie2Fill />,
       subMenu: [
-        { name: 'Upcoming Showing', link: '/admin/upcoming' },
+        { name: 'Upcoming show', link: '/admin/upcoming' },
         { name: 'Now Showing', link: '/admin/nowshowing' },
         { name: 'Manage Seats', link: '/admin/seats' },
       ],

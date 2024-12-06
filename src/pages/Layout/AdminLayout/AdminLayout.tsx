@@ -28,7 +28,6 @@ const AdminLayout = () => {
     }
   };
 
-
   useEffect(() => {
     if (isShowDropdown) {
       document.addEventListener("mousedown", handleClickOutside);
@@ -38,7 +37,6 @@ const AdminLayout = () => {
       document.removeEventListener("keydown", handleKeyDown);
     }
 
-    // Cleanup on unmount
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
@@ -48,9 +46,16 @@ const AdminLayout = () => {
   return (
     <div className="flex flex-row gap-2 bg-secondary min-h-screen w-full p-2.5">
       <SideBar />
-      <main className="w-full p-2.5 rounded-lg flex flex-col">
+      <main
+        id="mainContainer"
+        className="w-full p-2 rounded-lg flex flex-col overflow-auto h-[calc(100vh-1.3rem)]"
+      >
         <div className="relative w-full bg-white rounded shadow p-2.5 mb-2 flex items-center justify-end">
-          <IoMdMenu onClick={toggleSidebar} className="mr-auto cursor-pointer text-primary hover:text-slate-600 transition-all ease-in" size={30} />
+          <IoMdMenu
+            onClick={toggleSidebar}
+            className="mr-auto cursor-pointer text-primary hover:text-slate-600 transition-all ease-in"
+            size={30}
+          />
           <div
             onClick={() => setIsShowDropdown(!isShowDropdown)}
             className="flex items-center gap-1 cursor-pointer"
