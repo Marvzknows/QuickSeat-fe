@@ -1,13 +1,8 @@
-import { createContext, useState } from "react";
-import { ContextProviderType, UserContextType } from "../../types/context";
-
-export const UserContext = createContext<UserContextType>({
-  isCollapse: false,
-  toggleSidebar: () => {},
-});
+import { useState } from "react";
+import { ContextProviderType } from "../../types/context";
+import { UserContext } from "./userContext";
 
 const ContextProvider = ({ children }: ContextProviderType): JSX.Element => {
-  // Define Cookies here
   const [isCollapse, setIsCollapse] = useState(true);
 
   const toggleSidebar = () => {

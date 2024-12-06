@@ -5,7 +5,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import "./Sidebar.css";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { MdEventSeat, MdOutlineSportsKabaddi } from "react-icons/md";
-import { UserContext } from "../../../assets/context/contextApi";
+import { UserContext } from "../../../assets/context/userContext";
 
 const SideBar = () => {
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);

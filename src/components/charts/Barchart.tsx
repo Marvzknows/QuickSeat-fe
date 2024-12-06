@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { TooltipProps } from "recharts";
 
 type sampleDataType = {
   movieName: string;
@@ -45,14 +46,18 @@ const AdminBarChart = () => {
   ];
 
   // Custom Tooltip Component
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: TooltipProps<number, string>) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white shadow-md p-2 rounded">
           <p className="font-bold">{label}</p>
           <p className="text-gray-600">Tickets Sold: {payload[0].value}</p>
           <p className="text-gray-600">
-            Revenue: ₱{payload[1].value.toLocaleString()}
+            Revenue: ₱{(payload[1].value || 0).toLocaleString()}
           </p>
         </div>
       );
