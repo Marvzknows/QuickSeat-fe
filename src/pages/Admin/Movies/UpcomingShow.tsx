@@ -4,10 +4,38 @@ import SectionHeader from "../../../components/Headers/AdminHeaders";
 import AdminContainer from "../../Layout/AdminLayout/AdminContainer";
 import { HiMiniViewfinderCircle } from "react-icons/hi2";
 import { AiFillDelete } from "react-icons/ai";
+import { useState } from "react";
+import ImageUpload from "../../../components/input/FileInput";
+import FormModal from "../../../components/modals/FormModal";
+import InputField from "../../../components/input/input";
 
 const UpcomingShow = () => {
+  const [isShowModal, setIsShowModal] = useState(false);
+  // const [uploadData, setUploadData] = useState({
+  //   movieName: 'The batman'
+  // })
+
+  const [imageUpload, setImageUpload] = useState<File | null>(null);
+
   const movieBannerLink =
     "https://marketplace.canva.com/EAFVCFkAg3w/1/0/1131w/canva-red-and-black-horror-movie-poster-AOBSIAmLWOs.jpg";
+
+  const OnClickAddNewShow = () => setIsShowModal(!isShowModal);
+
+  const HandleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    if (!imageUpload) {
+      return console.log("Movie Poster is required");
+    }
+    // formData.append("movieName", uploadData.movieName);
+    formData.append("moviePoster", imageUpload);
+    console.log("PAYLOAD: ", formData);
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
+  };
 
   return (
     <AdminContainer>
@@ -16,11 +44,14 @@ const UpcomingShow = () => {
         currentPage={"Upcoming show"}
       />
 
-      {/* Make this div grow to fill remaining space */}
+      {/* Make this div grow to fill remaining space use flex-grow flex */}
       <div className="flex-grow flex flex-col">
         <div className="w-full h-full flex flex-col p-2.5 bg-white rounded-lg shadow border border-neutral-200 overflow-auto">
           <div className="flex items-center w-full">
-            <Button className="ml-auto flex items-center gap-2-">
+            <Button
+              onClick={OnClickAddNewShow}
+              className="ml-auto flex items-center gap-2-"
+            >
               <MdAdd size={18} /> Add New Show
             </Button>
           </div>
@@ -30,7 +61,7 @@ const UpcomingShow = () => {
               <caption className="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
                 Upcoming shows
                 <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Lists of upcoming shows,
+                  Lists of upcoming shows
                 </p>
               </caption>
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -90,6 +121,31 @@ const UpcomingShow = () => {
           </div>
         </div>
       </div>
+
+      {isShowModal && (
+        <FormModal
+          onSubmit={HandleOnSubmit}
+          onClose={() => {
+            setIsShowModal(false);
+            setImageUpload(null);
+          }}
+          title="Add new show"
+        >
+          <div className="flex flex-col w-full  border-danger">
+            <ImageUpload
+              name="moviePoster"
+              id="moviePoster"
+              setImageUpload={setImageUpload}
+            />
+            <InputField
+              name="movieName"
+              id="movieName"
+              className="mt-5"
+              label="Movie name"
+            />
+          </div>
+        </FormModal>
+      )}
     </AdminContainer>
   );
 };

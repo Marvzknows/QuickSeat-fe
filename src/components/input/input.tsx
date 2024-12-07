@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 type InputFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
-  type: "text" | "password" | "email" | "number";
+  type?: "text" | "password" | "email" | "number";
   placeholder?: string;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
@@ -10,7 +10,7 @@ type InputFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
 
 const InputField = ({
   label,
-  type,
+  type = "text",
   placeholder = "Enter your value",
   className,
   leftIcon,
