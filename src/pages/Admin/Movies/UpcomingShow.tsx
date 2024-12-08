@@ -4,10 +4,13 @@ import SectionHeader from "../../../components/Headers/AdminHeaders";
 import AdminContainer from "../../Layout/AdminLayout/AdminContainer";
 import { HiMiniViewfinderCircle } from "react-icons/hi2";
 import { AiFillDelete } from "react-icons/ai";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ImageUpload from "../../../components/input/FileInput";
 import FormModal from "../../../components/modals/FormModal";
 import InputField from "../../../components/input/input";
+import MultiSelectDropdown, {
+  Option,
+} from "../../../components/dropdown/MultiSelect";
 
 const UpcomingShow = () => {
   const [isShowModal, setIsShowModal] = useState(false);
@@ -36,6 +39,17 @@ const UpcomingShow = () => {
       console.log(key, value);
     });
   };
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+  const [options, setOptions] = useState<Option[]>([]);
+
+  useEffect(() => {
+    setOptions([
+      { id: "1", value: "Option 1 Marvzknows" },
+      { id: "2", value: "Option 2" },
+      { id: "3", value: "Option 3 Julsdesu" },
+      { id: "4", value: "Option 4 Doljeiongie" },
+    ]);
+  }, []);
 
   return (
     <AdminContainer>
@@ -142,6 +156,14 @@ const UpcomingShow = () => {
               id="movieName"
               className="mt-5"
               label="Movie name"
+            />
+            <MultiSelectDropdown
+              label="Genre"
+              options={options}
+              setOptions={setOptions}
+              selectedOptions={selectedOptions}
+              setSelectedOptions={setSelectedOptions}
+              className="w-64"
             />
           </div>
         </FormModal>
