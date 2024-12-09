@@ -11,12 +11,14 @@ import InputField from "../../../components/input/input";
 import MultiSelectDropdown, {
   Option,
 } from "../../../components/dropdown/MultiSelect";
+import SelectDropdown from "../../../components/dropdown/SelectDropdown";
 
 const UpcomingShow = () => {
   const [isShowModal, setIsShowModal] = useState(false);
-  // const [uploadData, setUploadData] = useState({
-  //   movieName: 'The batman'
-  // })
+  const [uploadData, setUploadData] = useState({
+    movieName: "The batman",
+    rating: "",
+  });
 
   const [imageUpload, setImageUpload] = useState<File | null>(null);
 
@@ -42,6 +44,12 @@ const UpcomingShow = () => {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const [options, setOptions] = useState<Option[]>([]);
 
+  const ratingsOption = [
+    { id: "G", value: "G" },
+    { id: "PG", value: "PG" },
+    { id: "SPG", value: "SPG" },
+  ];
+
   useEffect(() => {
     setOptions([
       { id: "1", value: "Option 1 Marvzknows" },
@@ -50,6 +58,10 @@ const UpcomingShow = () => {
       { id: "4", value: "Option 4 Doljeiongie" },
     ]);
   }, []);
+
+  const HandleOnchangeSelect = (option: Option) => {
+    setUploadData((prev) => ({ ...prev, rating: option.value }));
+  };
 
   return (
     <AdminContainer>
@@ -157,17 +169,28 @@ const UpcomingShow = () => {
               className="mt-5"
               label="Movie name"
             />
-            <MultiSelectDropdown
-              label="Genre"
-              options={options}
-              setOptions={setOptions}
-              selectedOptions={selectedOptions}
-              setSelectedOptions={setSelectedOptions}
-              className="w-64"
-            />
+            <div className="flex flex-col md:flex-row items-center">
+              <MultiSelectDropdown
+                label="Genre"
+                options={options}
+                setOptions={setOptions}
+                selectedOptions={selectedOptions}
+                setSelectedOptions={setSelectedOptions}
+                className="w-full"
+              />
+              <SelectDropdown
+                handleOnchange={HandleOnchangeSelect}
+                label="Rating"
+                options={ratingsOption}
+                value={uploadData.rating}
+                className="w-full"
+              />
+            </div>
           </div>
         </FormModal>
       )}
+
+      <Button onClick={() => console.log(uploadData)}>View payload</Button>
     </AdminContainer>
   );
 };

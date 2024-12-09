@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
+import useClickOutside from "../../hooks/useClickOutside";
 
 export type Option = {
   id: string;
@@ -23,8 +24,7 @@ const MultiSelect = ({
   setSelectedOptions,
   className,
 }: MultiSelectDropdownProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen, ref] = useClickOutside(false);
   const originalOptionsRef = useRef<Option[]>(options);
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);
@@ -55,22 +55,8 @@ const MultiSelect = ({
     });
   };
 
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, []);
-
   return (
-    <div ref={dropdownRef} className={`p-2 ${className}`}>
+    <div ref={ref} className={`p-2 ${className}`}>
       {label && (
         <span className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 mb-2 font-medium">
           {label}
@@ -95,7 +81,7 @@ const MultiSelect = ({
             </span>
           ))
         ) : (
-          <span className="p-1.5 text-gray-500 rounded text-xs">
+          <span className="text-gray-500 rounded text-xs">
             Select options...
           </span>
         )}
