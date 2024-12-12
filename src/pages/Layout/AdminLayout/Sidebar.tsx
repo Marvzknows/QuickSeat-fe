@@ -5,7 +5,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import "./Sidebar.css";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { MdEventSeat, MdOutlineSportsKabaddi } from "react-icons/md";
-import { UserContext } from "../../../assets/context/userContext";
+import { UserContext } from "../../../context/userContext";
 
 const SideBar = () => {
   const { isCollapse, toggleSidebar } = useContext(UserContext);
@@ -43,10 +43,9 @@ const SideBar = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const closeAllSubMenu = navLinks.map((link) =>
-      link.isActive ? { ...link, isActive: false } : link,
+    setNavLinks((prev) =>
+      prev.map((link) => (link.isActive ? { ...link, isActive: false } : link)),
     );
-    setNavLinks(closeAllSubMenu);
   }, [isCollapse]);
 
   const isSubMenuActive = (

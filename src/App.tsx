@@ -6,12 +6,12 @@ import UpcomingShow from "./pages/Admin/Movies/UpcomingShow";
 import ProtectedRoute from "./pages/Layout/AdminLayout/AdminProtectedRoute";
 import AdminLayout from "./pages/Layout/AdminLayout/AdminLayout";
 import NowShowing from "./pages/Admin/Movies/NowShowing";
-import ContextProvider from "./assets/context/contextApi";
+import ContextProvider from "./context/contextApi";
 
 function App() {
   return (
-    <ContextProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <ContextProvider>
         <Routes>
           <Route path="/" element={<Login />} />
 
@@ -39,8 +39,8 @@ function App() {
           </Route>
         </Route> */}
         </Routes>
-      </BrowserRouter>
-    </ContextProvider>
+      </ContextProvider>
+    </BrowserRouter>
   );
 }
 

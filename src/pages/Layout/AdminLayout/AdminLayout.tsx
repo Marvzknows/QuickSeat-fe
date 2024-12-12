@@ -6,7 +6,7 @@ import { SlLogout } from "react-icons/sl";
 import { useContext, useEffect, useRef, useState } from "react";
 import { MdArrowDropDown, MdArrowDropUp } from "react-icons/md";
 import { IoMdMenu } from "react-icons/io";
-import { UserContext } from "../../../assets/context/userContext";
+import { UserContext } from "../../../context/userContext";
 
 const AdminLayout = () => {
   const [isShowDropdown, setIsShowDropdown] = useState(false);

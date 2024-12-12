@@ -1,39 +1,56 @@
 import InputField from "../../components/input/input";
 import Button from "../../components/buttons/Buttons";
 import Checkbox from "../../components/checkbox/CheckBox";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
+import { BASE_URL } from "../../types/api";
+import { UserContext } from "../../context/userContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const context = useContext(UserContext);
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState<Record<string, string>>({
     username: "",
     password: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const HandleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const HandleOnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { username, password } = credentials;
+
     if (!username.trim() || !password.trim()) {
       toast.error("Please fill in all fields");
       return;
     }
 
-    console.table(credentials);
+    try {
+      setIsLoading(true);
+      const response = await axios.post(`${BASE_URL}/api/login`, credentials);
+
+      if (response.status >= 200 && response.data) {
+        context.saveSession(response.data);
+        navigate("/admin/dashboard");
+      }
+      setIsLoading(false);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(`Error: ${error.response.data.message}`);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const HandleCredentials = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (name === "username") {
-      setCredentials((prev) => ({ ...prev, username: value }));
-      return;
-    }
-
-    if (name === "password") {
-      setCredentials((prev) => ({ ...prev, password: value }));
-      return;
-    }
+    setCredentials((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -76,8 +93,13 @@ const Login = () => {
             </div>
 
             <div className="mx-2 mt-3">
-              <Button type="submit" variant="primary" className="w-full">
-                SIGN IN
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? "SIGNING IN..." : "SIGN IN"}
               </Button>
             </div>
           </form>
