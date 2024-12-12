@@ -15,6 +15,8 @@ import SelectDropdown from "../../../components/dropdown/SelectDropdown";
 
 const UpcomingShow = () => {
   const [isShowModal, setIsShowModal] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState<Option[]>([]); // split when passing as payload
+  const [options, setOptions] = useState<Option[]>([]);
   const [uploadData, setUploadData] = useState({
     movieName: "The batman",
     rating: "",
@@ -41,8 +43,6 @@ const UpcomingShow = () => {
       console.log(key, value);
     });
   };
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-  const [options, setOptions] = useState<Option[]>([]);
 
   const ratingsOption = [
     { id: "G", value: "G" },
@@ -61,6 +61,19 @@ const UpcomingShow = () => {
 
   const HandleOnchangeSelect = (option: Option) => {
     setUploadData((prev) => ({ ...prev, rating: option.value }));
+  };
+
+  const HandleSelectGenre = (option: Option) => {
+    setSelectedGenre((prev) => {
+      // Check if the option is already selected
+      if (prev.some((selected) => selected.id === option.id)) {
+        // Remove the option if already selected
+        return prev.filter((selected) => selected.id !== option.id);
+      } else {
+        // Add the option if not already selected
+        return [...prev, option];
+      }
+    });
   };
 
   return (
@@ -173,9 +186,8 @@ const UpcomingShow = () => {
               <MultiSelectDropdown
                 label="Genre"
                 options={options}
-                setOptions={setOptions}
-                selectedOptions={selectedOptions}
-                setSelectedOptions={setSelectedOptions}
+                value={selectedGenre}
+                onChange={HandleSelectGenre}
                 className="w-full"
               />
               <SelectDropdown
@@ -190,7 +202,7 @@ const UpcomingShow = () => {
         </FormModal>
       )}
 
-      <Button onClick={() => console.log(uploadData)}>View payload</Button>
+      <Button onClick={() => console.log(selectedGenre)}>View payload</Button>
     </AdminContainer>
   );
 };
