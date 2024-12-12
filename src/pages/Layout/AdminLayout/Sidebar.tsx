@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { RxDashboard } from "react-icons/rx";
 import { RiMovie2Fill } from "react-icons/ri";
 import { NavLink, useLocation } from "react-router-dom";
@@ -8,21 +8,20 @@ import { MdEventSeat, MdOutlineSportsKabaddi } from "react-icons/md";
 import { UserContext } from "../../../assets/context/userContext";
 
 const SideBar = () => {
-  const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
   const { isCollapse, toggleSidebar } = useContext(UserContext);
-  const location = useLocation();
-
-  const NavLinks = [
+  const [navLinks, setNavLinks] = useState([
     {
       name: "Dashboard",
       link: "/admin/dashboard",
       icon: <RxDashboard />,
       subMenu: null,
+      isActive: false,
     },
     {
       name: "Movies",
       link: "",
       icon: <RiMovie2Fill />,
+      isActive: false,
       subMenu: [
         { name: "Upcoming show", link: "/admin/upcoming" },
         { name: "Now Showing", link: "/admin/nowshowing" },
@@ -33,17 +32,22 @@ const SideBar = () => {
       name: "Sport",
       link: "",
       icon: <MdOutlineSportsKabaddi />,
+      isActive: false,
       subMenu: [
         { name: "Basketball", link: "/admin/basketball" },
         { name: "Volleyball", link: "/admin/volleyball" },
         { name: "Boxing", link: "/admin/boxing" },
       ],
     },
-  ];
+  ]);
+  const location = useLocation();
 
-  const handleToggle = (name: string) => {
-    setOpenSubMenu((prev) => (prev === name ? null : name));
-  };
+  useEffect(() => {
+    const closeAllSubMenu = navLinks.map((link) =>
+      link.isActive ? { ...link, isActive: false } : link,
+    );
+    setNavLinks(closeAllSubMenu);
+  }, [isCollapse]);
 
   const isSubMenuActive = (
     subMenu: { name: string; link: string }[] | null,
@@ -71,7 +75,7 @@ const SideBar = () => {
       </div>
 
       <ul className="mt-5">
-        {NavLinks.map((navItem, index) => (
+        {navLinks.map((navItem, index) => (
           <li onClick={!isCollapse ? toggleSidebar : undefined} key={index}>
             {!navItem.subMenu ? (
               <NavLink
@@ -94,23 +98,27 @@ const SideBar = () => {
                     ? "bg-black text-white"
                     : "text-gray-700 hover:bg-slate-200 hover:text-primary"
                 }`}
-                onClick={() => handleToggle(navItem.name)}
+                onClick={() => {
+                  setNavLinks(
+                    navLinks.map((link) =>
+                      link.name === navItem.name
+                        ? { ...link, isActive: !link.isActive }
+                        : link,
+                    ),
+                  );
+                }}
               >
                 {navItem.icon}
                 {isCollapse && <span>{navItem.name}</span>}
                 {navItem.subMenu && isCollapse && (
                   <span className="ml-auto">
-                    {openSubMenu === navItem.name ? (
-                      <FaAngleUp />
-                    ) : (
-                      <FaAngleDown />
-                    )}
+                    {navItem.isActive ? <FaAngleUp /> : <FaAngleDown />}
                   </span>
                 )}
               </div>
             )}
 
-            {navItem.subMenu && openSubMenu === navItem.name && isCollapse && (
+            {navItem.subMenu && navItem.isActive && (
               <ul className="ml-5 mt-1 px-2 bg-secondary rounded-sm border border-slate-200">
                 {navItem.subMenu.map((subItem, subIndex) => (
                   <li key={subIndex}>
