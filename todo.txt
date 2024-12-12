@@ -25,4 +25,5 @@ COLOR PALLETE THEME: https://colorhunt.co/palette/040d12183d3d5c837493b1a6
     -> **DONE** Main bar
 
 - Responsiveness
+- custom hook for toggle dropdowns
     

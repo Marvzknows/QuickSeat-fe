@@ -11,12 +11,16 @@ import InputField from "../../../components/input/input";
 import MultiSelectDropdown, {
   Option,
 } from "../../../components/dropdown/MultiSelect";
+import SelectDropdown from "../../../components/dropdown/SelectDropdown";
 
 const UpcomingShow = () => {
   const [isShowModal, setIsShowModal] = useState(false);
-  // const [uploadData, setUploadData] = useState({
-  //   movieName: 'The batman'
-  // })
+  const [selectedGenre, setSelectedGenre] = useState<Option[]>([]); // split when passing as payload
+  const [options, setOptions] = useState<Option[]>([]);
+  const [uploadData, setUploadData] = useState({
+    movieName: "The batman",
+    rating: "",
+  });
 
   const [imageUpload, setImageUpload] = useState<File | null>(null);
 
@@ -39,8 +43,12 @@ const UpcomingShow = () => {
       console.log(key, value);
     });
   };
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-  const [options, setOptions] = useState<Option[]>([]);
+
+  const ratingsOption = [
+    { id: "G", value: "G" },
+    { id: "PG", value: "PG" },
+    { id: "SPG", value: "SPG" },
+  ];
 
   useEffect(() => {
     setOptions([
@@ -50,6 +58,23 @@ const UpcomingShow = () => {
       { id: "4", value: "Option 4 Doljeiongie" },
     ]);
   }, []);
+
+  const HandleOnchangeSelect = (option: Option) => {
+    setUploadData((prev) => ({ ...prev, rating: option.value }));
+  };
+
+  const HandleSelectGenre = (option: Option) => {
+    setSelectedGenre((prev) => {
+      // Check if the option is already selected
+      if (prev.some((selected) => selected.id === option.id)) {
+        // Remove the option if already selected
+        return prev.filter((selected) => selected.id !== option.id);
+      } else {
+        // Add the option if not already selected
+        return [...prev, option];
+      }
+    });
+  };
 
   return (
     <AdminContainer>
@@ -157,17 +182,27 @@ const UpcomingShow = () => {
               className="mt-5"
               label="Movie name"
             />
-            <MultiSelectDropdown
-              label="Genre"
-              options={options}
-              setOptions={setOptions}
-              selectedOptions={selectedOptions}
-              setSelectedOptions={setSelectedOptions}
-              className="w-64"
-            />
+            <div className="flex flex-col md:flex-row items-center">
+              <MultiSelectDropdown
+                label="Genre"
+                options={options}
+                value={selectedGenre}
+                onChange={HandleSelectGenre}
+                className="w-full"
+              />
+              <SelectDropdown
+                handleOnchange={HandleOnchangeSelect}
+                label="Rating"
+                options={ratingsOption}
+                value={uploadData.rating}
+                className="w-full"
+              />
+            </div>
           </div>
         </FormModal>
       )}
+
+      <Button onClick={() => console.log(selectedGenre)}>View payload</Button>
     </AdminContainer>
   );
 };

@@ -1,36 +1,31 @@
-import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
+import { Option } from "./MultiSelect";
+import { RiArrowDropUpLine, RiArrowDropDownLine } from "react-icons/ri";
 import useClickOutside from "../../hooks/useClickOutside";
 
-export type Option = {
-  id: string;
-  value: string;
+type SelectDropdownType = {
+  label?: string;
+  className?: string;
+  options: Option[];
+  value: string | number | undefined;
+  handleOnchange: (data: Option) => void;
 };
 
-type MultiSelectDropdownProps = {
-  label?: string;
-  options: Option[];
-  onChange: (option: Option) => void;
-  value: Option[];
-  className?: string;
-};
-const MultiSelect = ({
+const SelectDropdown = ({
   label,
-  options,
-  onChange,
-  value,
   className,
-}: MultiSelectDropdownProps) => {
+  options,
+  value,
+  handleOnchange,
+}: SelectDropdownType) => {
   const [isOpen, setIsOpen, ref] = useClickOutside(false);
   const toggleDropdown = () => setIsOpen((prev) => !prev);
 
-  const createClickHandler =
-    (option: Option) => (e: React.MouseEvent<HTMLSpanElement>) => {
-      e.stopPropagation();
-      onChange(option);
-    };
-
-  const isOptionSelected = (option: Option) =>
-    value.some((val) => option.id === val.id && option.value === val.value);
+  const HandleOnSelect = (id: string) => {
+    const selectedOption = options.find((option) => option.id === id);
+    if (!selectedOption) return;
+    handleOnchange(selectedOption);
+    setIsOpen(false);
+  };
 
   return (
     <div ref={ref} className={`p-2 ${className}`}>
@@ -42,17 +37,13 @@ const MultiSelect = ({
 
       <div
         onClick={toggleDropdown}
-        className="relative flex flex-wrap items-center gap-1 border rounded border-gray-300 p-2 cursor-pointer"
+        className="relative flex items-center border rounded border-gray-300 p-2.5 cursor-pointer"
       >
-        {value.map((val) => (
-          <span
-            onClick={createClickHandler(val)}
-            key={val.id}
-            className="p-1.5 bg-blue-100 text-blue-800 rounded text-xs"
-          >
-            {val.value}
-          </span>
-        ))}
+        {value ? (
+          <span className="text-xs">{value}</span>
+        ) : (
+          <span className="text-xs">Select options...</span>
+        )}
 
         <span className="ml-auto">
           {isOpen ? (
@@ -67,9 +58,12 @@ const MultiSelect = ({
             {options.length ? (
               options.map((item) => (
                 <li
-                  onClick={createClickHandler(item)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    HandleOnSelect(item.id);
+                  }}
                   key={item.id}
-                  className={`flex items-center gap-2 px-3 py-2 text-xs cursor-pointer ${isOptionSelected(item) ? "bg-blue-100" : "hover:bg-blue-100"}`}
+                  className={`flex items-center gap-2 px-3 py-2 text-xs cursor-pointer ${item.id === value || item.value === value ? "bg-blue-200" : ""} hover:bg-blue-100`}
                 >
                   {item.value}
                 </li>
@@ -86,4 +80,4 @@ const MultiSelect = ({
   );
 };
 
-export default MultiSelect;
+export default SelectDropdown;
