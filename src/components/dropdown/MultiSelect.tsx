@@ -44,15 +44,19 @@ const MultiSelect = ({
         onClick={toggleDropdown}
         className="relative flex flex-wrap items-center gap-1 border rounded border-gray-300 p-2 cursor-pointer"
       >
-        {value.map((val) => (
-          <span
-            onClick={createClickHandler(val)}
-            key={val.id}
-            className="p-1.5 bg-blue-100 text-blue-800 rounded text-xs"
-          >
-            {val.value}
-          </span>
-        ))}
+        {!value.length ? (
+          <span className="p-1.5 text-xs">Select options...</span>
+        ) : (
+          value.map((val) => (
+            <span
+              onClick={createClickHandler(val)}
+              key={val.id}
+              className="p-1.5 bg-blue-100 text-blue-800 rounded text-xs"
+            >
+              {val.value}
+            </span>
+          ))
+        )}
 
         <span className="ml-auto">
           {isOpen ? (

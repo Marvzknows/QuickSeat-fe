@@ -197,6 +197,13 @@ const UpcomingShow = () => {
                 value={uploadData.rating}
                 className="w-full"
               />
+              <InputField
+                name="movieDuration"
+                id="movieDuration"
+                className="w-full"
+                label="Movie Duration"
+                type="number"
+              />
             </div>
           </div>
         </FormModal>
