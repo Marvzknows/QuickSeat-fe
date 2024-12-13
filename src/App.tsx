@@ -18,9 +18,6 @@ function App() {
           {/* ADMIN ROUTES */}
           <Route>
             <Route path="/admin" element={<ProtectedRoute />}>
-              {" "}
-              {/* Add a protected route here as an element */}
-              {/* Admin Layout */}
               <Route element={<AdminLayout />}>
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="upcoming" element={<UpcomingShow />} />
