@@ -4,7 +4,7 @@ import SectionHeader from "../../../components/Headers/AdminHeaders";
 import AdminContainer from "../../Layout/AdminLayout/AdminContainer";
 import { HiMiniViewfinderCircle } from "react-icons/hi2";
 import { AiFillDelete } from "react-icons/ai";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ImageUpload from "../../../components/input/FileInput";
 import FormModal from "../../../components/modals/FormModal";
 import InputField from "../../../components/input/input";
@@ -12,15 +12,21 @@ import MultiSelectDropdown, {
   Option,
 } from "../../../components/dropdown/MultiSelect";
 import SelectDropdown from "../../../components/dropdown/SelectDropdown";
+import { AddUpcommingApi } from "../../../api/admin/upcomingMovieApi";
+import { UserContext } from "../../../context/userContext";
 
 const UpcomingShow = () => {
   const [isShowModal, setIsShowModal] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<Option[]>([]); // split when passing as payload
   const [options, setOptions] = useState<Option[]>([]);
   const [uploadData, setUploadData] = useState({
-    movieName: "The batman",
-    rating: "",
+    //movie_name, image, mtrcb_rating, genre, duration
+    movie_name: "The batman",
+    mtrcb_rating: "",
+    duration: "",
   });
+
+  const context = useContext(UserContext);
 
   const [imageUpload, setImageUpload] = useState<File | null>(null);
 
@@ -29,19 +35,31 @@ const UpcomingShow = () => {
 
   const OnClickAddNewShow = () => setIsShowModal(!isShowModal);
 
-  const HandleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const HandleOnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formData = new FormData();
+    if (!context.session) return;
+
     if (!imageUpload) {
-      return console.log("Movie Poster is required");
+      console.log("Movie Poster is requiredss");
+      return;
     }
-    // formData.append("movieName", uploadData.movieName);
-    formData.append("moviePoster", imageUpload);
-    console.log("PAYLOAD: ", formData);
-    formData.forEach((value, key) => {
-      console.log(key, value);
+
+    const splitGenre = selectedGenre.map((data) => data.value).join(", "); // split when passing as payload
+
+    const formData = new FormData();
+    formData.append("movie_name", uploadData.movie_name);
+    formData.append("image", imageUpload);
+    formData.append("mtrcb_rating", uploadData.mtrcb_rating);
+    formData.append("genre", splitGenre);
+    formData.append("duration", uploadData.duration);
+
+    const response = await AddUpcommingApi({
+      token: context.session.acces_token,
+      data: formData,
     });
+
+    console.log("RESPONSE: ", response);
   };
 
   const ratingsOption = [
@@ -52,15 +70,15 @@ const UpcomingShow = () => {
 
   useEffect(() => {
     setOptions([
-      { id: "1", value: "Option 1 Marvzknows" },
-      { id: "2", value: "Option 2" },
-      { id: "3", value: "Option 3 Julsdesu" },
-      { id: "4", value: "Option 4 Doljeiongie" },
+      { id: "1", value: "Horror" },
+      { id: "2", value: "Dramar" },
+      { id: "3", value: "Romance" },
+      { id: "4", value: "Action" },
     ]);
   }, []);
 
   const HandleOnchangeSelect = (option: Option) => {
-    setUploadData((prev) => ({ ...prev, rating: option.value }));
+    setUploadData((prev) => ({ ...prev, mtrcb_rating: option.value }));
   };
 
   const HandleSelectGenre = (option: Option) => {
@@ -74,6 +92,11 @@ const UpcomingShow = () => {
         return [...prev, option];
       }
     });
+  };
+
+  const HandleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setUploadData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -140,7 +163,7 @@ const UpcomingShow = () => {
                   <td className="px-6 py-4">Horror, Suspense, Thriller</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center font-bold text-danger">
-                      Online
+                      SPG
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -172,15 +195,16 @@ const UpcomingShow = () => {
         >
           <div className="flex flex-col w-full  border-danger">
             <ImageUpload
-              name="moviePoster"
-              id="moviePoster"
+              name="image"
+              id="image"
               setImageUpload={setImageUpload}
             />
             <InputField
-              name="movieName"
-              id="movieName"
+              name="movie_name"
+              id="movie_name"
               className="mt-5"
               label="Movie name"
+              onChange={HandleOnchange}
             />
             <div className="flex flex-col md:flex-row items-center">
               <MultiSelectDropdown
@@ -194,22 +218,21 @@ const UpcomingShow = () => {
                 handleOnchange={HandleOnchangeSelect}
                 label="Rating"
                 options={ratingsOption}
-                value={uploadData.rating}
+                value={uploadData.mtrcb_rating}
                 className="w-full"
               />
               <InputField
-                name="movieDuration"
-                id="movieDuration"
+                name="duration"
+                id="duration"
                 className="w-full"
                 label="Movie Duration"
                 type="number"
+                onChange={HandleOnchange}
               />
             </div>
           </div>
         </FormModal>
       )}
-
-      <Button onClick={() => console.log(selectedGenre)}>View payload</Button>
     </AdminContainer>
   );
 };

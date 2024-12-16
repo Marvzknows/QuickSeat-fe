@@ -1,9 +1,9 @@
 import axios from "axios";
 import qs from "qs";
 
-export type RequestApi<TData = Record<string, unknown>> = {
+export type RequestApi<TData = Record<string, unknown> | FormData> = {
   abortController?: AbortController;
-  apiUrl: string;
+  apiUrl?: string;
   token: string;
   signal?: AbortSignal;
   params?: Record<string, string | number | boolean>;
