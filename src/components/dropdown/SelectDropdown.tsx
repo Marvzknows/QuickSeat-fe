@@ -1,6 +1,6 @@
-import { Option } from "./MultiSelect";
 import { RiArrowDropUpLine, RiArrowDropDownLine } from "react-icons/ri";
 import useClickOutside from "../../hooks/useClickOutside";
+import { Option } from "../../types/AdminTypes/Admin";
 
 type SelectDropdownType = {
   label?: string;
@@ -63,9 +63,9 @@ const SelectDropdown = ({
                     HandleOnSelect(item.id);
                   }}
                   key={item.id}
-                  className={`flex items-center gap-2 px-3 py-2 text-xs cursor-pointer ${item.id === value || item.value === value ? "bg-blue-200" : ""} hover:bg-blue-100`}
+                  className={`flex items-center gap-2 px-3 py-2 text-xs cursor-pointer ${item.id === value || item.name === value ? "bg-blue-200" : ""} hover:bg-blue-100`}
                 >
-                  {item.value}
+                  {item.name}
                 </li>
               ))
             ) : (

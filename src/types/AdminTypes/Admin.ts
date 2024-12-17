@@ -3,3 +3,8 @@ export type ListButtonProps = {
   onChangeHandler: (tabName: string) => void;
   isActive: boolean;
 };
+
+export type Option = {
+  id: string;
+  name: string;
+};

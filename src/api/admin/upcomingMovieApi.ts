@@ -25,6 +25,20 @@ export const AddUpcommingApi = async (props: RequestApi) => {
   }
 };
 
+export const GetGenresListApi = async (props: RequestApi) => {
+  try {
+    const response = await AxiosInstance(props).get(`${BASE_URL}/api/genres`);
+    return response.data;
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.error("Request canceled", error.message);
+    } else {
+      console.error("Error:", error);
+    }
+    throw error;
+  }
+};
+
 // export const CreateAddDropApi = async (props: RequestApi) => {
 //     const { apiUrl, data, endPoint } = props;
 

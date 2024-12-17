@@ -1,10 +1,6 @@
 import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
 import useClickOutside from "../../hooks/useClickOutside";
-
-export type Option = {
-  id: string;
-  value: string;
-};
+import { Option } from "../../types/AdminTypes/Admin";
 
 type MultiSelectDropdownProps = {
   label?: string;
@@ -30,7 +26,7 @@ const MultiSelect = ({
     };
 
   const isOptionSelected = (option: Option) =>
-    value.some((val) => option.id === val.id && option.value === val.value);
+    value.some((val) => option.id === val.id && option.name === val.name);
 
   return (
     <div ref={ref} className={`p-2 ${className}`}>
@@ -53,7 +49,7 @@ const MultiSelect = ({
               key={val.id}
               className="p-1.5 bg-blue-100 text-blue-800 rounded text-xs"
             >
-              {val.value}
+              {val.name}
             </span>
           ))
         )}
@@ -75,7 +71,7 @@ const MultiSelect = ({
                   key={item.id}
                   className={`flex items-center gap-2 px-3 py-2 text-xs cursor-pointer ${isOptionSelected(item) ? "bg-blue-100" : "hover:bg-blue-100"}`}
                 >
-                  {item.value}
+                  {item.name}
                 </li>
               ))
             ) : (

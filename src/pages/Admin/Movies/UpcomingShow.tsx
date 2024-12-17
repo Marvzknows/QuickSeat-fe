@@ -8,28 +8,30 @@ import { useContext, useEffect, useState } from "react";
 import ImageUpload from "../../../components/input/FileInput";
 import FormModal from "../../../components/modals/FormModal";
 import InputField from "../../../components/input/input";
-import MultiSelectDropdown, {
-  Option,
-} from "../../../components/dropdown/MultiSelect";
+import MultiSelectDropdown from "../../../components/dropdown/MultiSelect";
 import SelectDropdown from "../../../components/dropdown/SelectDropdown";
-import { AddUpcommingApi } from "../../../api/admin/upcomingMovieApi";
+import {
+  AddUpcommingApi,
+  GetGenresListApi,
+} from "../../../api/admin/upcomingMovieApi";
 import { UserContext } from "../../../context/userContext";
+import toast, { Toaster } from "react-hot-toast";
+import { Option } from "../../../types/AdminTypes/Admin";
+import { ratingsOption } from "../../../types/movies";
 
 const UpcomingShow = () => {
   const [isShowModal, setIsShowModal] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<Option[]>([]); // split when passing as payload
   const [options, setOptions] = useState<Option[]>([]);
   const [uploadData, setUploadData] = useState({
-    //movie_name, image, mtrcb_rating, genre, duration
     movie_name: "The batman",
     mtrcb_rating: "",
     duration: "",
   });
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const context = useContext(UserContext);
-
   const [imageUpload, setImageUpload] = useState<File | null>(null);
-
   const movieBannerLink =
     "https://marketplace.canva.com/EAFVCFkAg3w/1/0/1131w/canva-red-and-black-horror-movie-poster-AOBSIAmLWOs.jpg";
 
@@ -38,47 +40,73 @@ const UpcomingShow = () => {
   const HandleOnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const { movie_name, mtrcb_rating, duration } = uploadData;
+
     if (!context.session) return;
 
-    if (!imageUpload) {
-      console.log("Movie Poster is requiredss");
+    if (
+      !imageUpload ||
+      !selectedGenre ||
+      !movie_name ||
+      !mtrcb_rating ||
+      !duration
+    ) {
+      setErrorMessage("All Fields are Required");
       return;
     }
 
-    const splitGenre = selectedGenre.map((data) => data.value).join(", "); // split when passing as payload
+    setIsSubmitting(true);
+    const splitGenre = selectedGenre.map((data) => data.name).join(", "); // split when passing as payload
 
     const formData = new FormData();
-    formData.append("movie_name", uploadData.movie_name);
+    formData.append("movie_name", movie_name);
     formData.append("image", imageUpload);
-    formData.append("mtrcb_rating", uploadData.mtrcb_rating);
+    formData.append("mtrcb_rating", mtrcb_rating);
     formData.append("genre", splitGenre);
-    formData.append("duration", uploadData.duration);
+    formData.append("duration", duration);
 
     const response = await AddUpcommingApi({
       token: context.session.acces_token,
       data: formData,
     });
 
-    console.log("RESPONSE: ", response);
+    setIsSubmitting(false);
+    if (response && response.status) {
+      setIsShowModal(false);
+      setUploadData({
+        movie_name: "",
+        mtrcb_rating: "",
+        duration: "",
+      });
+      setSelectedGenre([]);
+      setErrorMessage("");
+      toast.success("New upcoming movie added successfully");
+    }
   };
 
-  const ratingsOption = [
-    { id: "G", value: "G" },
-    { id: "PG", value: "PG" },
-    { id: "SPG", value: "SPG" },
-  ];
-
   useEffect(() => {
-    setOptions([
-      { id: "1", value: "Horror" },
-      { id: "2", value: "Dramar" },
-      { id: "3", value: "Romance" },
-      { id: "4", value: "Action" },
-    ]);
-  }, []);
+    const controller = new AbortController();
+    GetGenresList(controller);
+
+    return () => controller.abort();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const GetGenresList = async (abortController: AbortController) => {
+    if (!context.session?.acces_token) return;
+    const response = await GetGenresListApi({
+      abortController,
+      token: context.session?.acces_token,
+    });
+
+    if (response && response.status) {
+      console.log("GENRES: ", response);
+      setOptions(response.data);
+      return;
+    }
+  };
 
   const HandleOnchangeSelect = (option: Option) => {
-    setUploadData((prev) => ({ ...prev, mtrcb_rating: option.value }));
+    setUploadData((prev) => ({ ...prev, mtrcb_rating: option.name }));
   };
 
   const HandleSelectGenre = (option: Option) => {
@@ -188,10 +216,13 @@ const UpcomingShow = () => {
         <FormModal
           onSubmit={HandleOnSubmit}
           onClose={() => {
+            if (isSubmitting) return;
             setIsShowModal(false);
             setImageUpload(null);
           }}
           title="Add new show"
+          errorMessage={errorMessage}
+          isLoading={isSubmitting}
         >
           <div className="flex flex-col w-full  border-danger">
             <ImageUpload
@@ -233,6 +264,7 @@ const UpcomingShow = () => {
           </div>
         </FormModal>
       )}
+      <Toaster position="top-center" reverseOrder={false} />
     </AdminContainer>
   );
 };
