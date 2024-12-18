@@ -8,6 +8,8 @@ type ModalPropsType = {
   children: ReactNode;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   submitText?: string;
+  errorMessage: string;
+  isLoading?: boolean;
 };
 
 const FormModal = ({
@@ -16,10 +18,12 @@ const FormModal = ({
   children,
   onSubmit,
   submitText = "Save",
+  errorMessage,
+  isLoading,
 }: ModalPropsType) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === "Escape" && !isLoading) {
         onClose();
       }
     };
@@ -31,7 +35,7 @@ const FormModal = ({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose]);
+  }, [onClose, isLoading]);
 
   return (
     <div
@@ -47,9 +51,12 @@ const FormModal = ({
             <span id="modal-title">{title}</span>
             <button
               type="button"
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
+              onClick={!isLoading ? onClose : undefined}
+              className={`text-gray-500 hover:text-gray-700 ${
+                isLoading ? "cursor-not-allowed opacity-50" : ""
+              }`}
               aria-label="Close modal"
+              disabled={isLoading}
             >
               <IoMdClose size={25} />
             </button>
@@ -61,6 +68,11 @@ const FormModal = ({
             {children}
           </div>
 
+          {errorMessage && (
+            <div className="text-xs font-medium text-red-500 py-4 px-1">
+              {errorMessage}
+            </div>
+          )}
           {/* Modal Footer */}
           <div className="border-t-2 mt-auto flex items-center justify-end gap-2 pt-2">
             <Button
@@ -71,7 +83,7 @@ const FormModal = ({
             >
               Close
             </Button>
-            <Button type="submit" className="px-5">
+            <Button type="submit" className="px-5" disabled={isLoading}>
               {submitText}
             </Button>
           </div>

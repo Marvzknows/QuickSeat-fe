@@ -11,7 +11,11 @@ import { UserContext } from "../../../context/userContext";
 const AdminLayout = () => {
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { toggleSidebar } = useContext(UserContext);
+  const { toggleSidebar, removeSession } = useContext(UserContext);
+
+  // const handleLogout = () => {
+  //   removeSession();
+  // }
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -99,8 +103,8 @@ const AdminLayout = () => {
                 </li>
                 <li
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent closing the dropdown
-                    console.log("LOGOUT");
+                    e.stopPropagation();
+                    removeSession();
                   }}
                   className="flex items-center rounded gap-4 p-1.5 hover:bg-secondary transition-all ease-in duration-200 cursor-pointer"
                 >

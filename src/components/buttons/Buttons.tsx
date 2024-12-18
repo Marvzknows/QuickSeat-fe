@@ -13,7 +13,8 @@ const Button = ({
   ...props
 }: ButtonType) => {
   const btnVariants = {
-    primary: "bg-primary text-white hover:bg-[#111827] active:bg-slate-600",
+    primary:
+      "bg-primary text-white hover:bg-[#111827] active:bg-slate-600 disabled:bg-gray-500",
     danger: "bg-danger text-white active:bg-red-400",
     success: "bg-success text-white active:bg-green-400",
     outline:

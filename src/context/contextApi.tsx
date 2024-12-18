@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const ContextProvider = ({ children }: ContextProviderType): JSX.Element => {
   const [isCollapse, setIsCollapse] = useState(true);
-  const [cookies, setCookie, removeCookie] = useCookies(["session"]);
+  const [cookies, setCookies, removeCookies] = useCookies(["session"]);
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
@@ -14,11 +14,11 @@ const ContextProvider = ({ children }: ContextProviderType): JSX.Element => {
   };
 
   const saveSession = (user: UserType) => {
-    setCookie("session", user);
+    setCookies("session", user, { path: "/" });
   };
 
   const removeSession = () => {
-    removeCookie("session");
+    removeCookies("session", { path: "/" });
     navigate("/");
   };
 

@@ -34,7 +34,13 @@ const Login = () => {
 
       if (response.status >= 200 && response.data) {
         context.saveSession(response.data);
-        navigate("/admin/dashboard");
+        if (response.data.user_information.role === "admin") {
+          navigate("/admin/dashboard");
+        }
+
+        if (response.data.user_information.role === "user") {
+          navigate("/");
+        }
       }
       setIsLoading(false);
     } catch (error) {
