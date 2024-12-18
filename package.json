@@ -11,6 +11,11 @@
     "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,scss,md}\""
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.2.1",
+    "@tanstack/react-query": "^5.62.8",
+    "@tanstack/react-query-devtools": "^5.62.8",
     "axios": "^1.7.8",
     "npm": "^10.9.1",
     "qs": "^6.13.1",

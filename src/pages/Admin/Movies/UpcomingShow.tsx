@@ -13,11 +13,15 @@ import SelectDropdown from "../../../components/dropdown/SelectDropdown";
 import {
   AddUpcommingApi,
   GetGenresListApi,
+  GetUpcomingMoviesListApi,
 } from "../../../api/admin/upcomingMovieApi";
 import { UserContext } from "../../../context/userContext";
 import toast, { Toaster } from "react-hot-toast";
 import { Option } from "../../../types/AdminTypes/Admin";
-import { ratingsOption } from "../../../types/movies";
+import { ratingsOption, UpcomingGenresType } from "../../../types/movies";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import CircularProgress from "@mui/material/CircularProgress";
+import { queryClient } from "../../../utils/queryClient";
 
 const UpcomingShow = () => {
   const [isShowModal, setIsShowModal] = useState(false);
@@ -28,14 +32,70 @@ const UpcomingShow = () => {
     mtrcb_rating: "",
     duration: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const context = useContext(UserContext);
   const [imageUpload, setImageUpload] = useState<File | null>(null);
-  const movieBannerLink =
-    "https://marketplace.canva.com/EAFVCFkAg3w/1/0/1131w/canva-red-and-black-horror-movie-poster-AOBSIAmLWOs.jpg";
 
   const OnClickAddNewShow = () => setIsShowModal(!isShowModal);
+
+  // Fetch Upcoming List
+  const {
+    error,
+    data: upcomingMoviesList,
+    isFetching,
+  } = useQuery({
+    queryKey: ["upcomingMovies"],
+    queryFn: () =>
+      GetUpcomingMoviesListApi({
+        token: context.session?.acces_token ?? "",
+      }),
+  });
+
+  // Fetch Movies Genres
+  const { data: genreList, error: errorGenreList } =
+    useQuery<UpcomingGenresType>({
+      queryKey: ["options"],
+      queryFn: () =>
+        GetGenresListApi({
+          token: context.session?.acces_token ?? "",
+        }),
+    });
+
+  useEffect(() => {
+    if (errorGenreList) setOptions([]);
+    setOptions(genreList?.data as Option[]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [genreList]);
+
+  // Add Upcoming Movies
+  const { mutateAsync: addUpcomingMutation, isPending: isSubmitting } =
+    useMutation({
+      mutationFn: async (formData: FormData) => {
+        await AddUpcommingApi({
+          token: context.session?.acces_token ?? "",
+          data: formData,
+        });
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["upcomingMovies"],
+        });
+
+        setIsShowModal(false);
+        setUploadData({
+          movie_name: "",
+          mtrcb_rating: "",
+          duration: "",
+        });
+        setSelectedGenre([]);
+        setErrorMessage("");
+        toast.success("New upcoming movie added successfully");
+      },
+      onError: (err) => {
+        toast.success(`${err}: Error adding new movie`);
+      },
+    });
 
   const HandleOnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,7 +115,6 @@ const UpcomingShow = () => {
       return;
     }
 
-    setIsSubmitting(true);
     const splitGenre = selectedGenre.map((data) => data.name).join(", "); // split when passing as payload
 
     const formData = new FormData();
@@ -65,44 +124,7 @@ const UpcomingShow = () => {
     formData.append("genre", splitGenre);
     formData.append("duration", duration);
 
-    const response = await AddUpcommingApi({
-      token: context.session.acces_token,
-      data: formData,
-    });
-
-    setIsSubmitting(false);
-    if (response && response.status) {
-      setIsShowModal(false);
-      setUploadData({
-        movie_name: "",
-        mtrcb_rating: "",
-        duration: "",
-      });
-      setSelectedGenre([]);
-      setErrorMessage("");
-      toast.success("New upcoming movie added successfully");
-    }
-  };
-
-  useEffect(() => {
-    const controller = new AbortController();
-    GetGenresList(controller);
-
-    return () => controller.abort();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const GetGenresList = async (abortController: AbortController) => {
-    if (!context.session?.acces_token) return;
-    const response = await GetGenresListApi({
-      abortController,
-      token: context.session?.acces_token,
-    });
-
-    if (response && response.status) {
-      console.log("GENRES: ", response);
-      setOptions(response.data);
-      return;
-    }
+    await addUpcomingMutation(formData);
   };
 
   const HandleOnchangeSelect = (option: Option) => {
@@ -147,67 +169,91 @@ const UpcomingShow = () => {
           </div>
 
           <div className="relative overflow-x-auto sm:rounded-lg">
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <caption className="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-                Upcoming shows
-                <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Lists of upcoming shows
-                </p>
-              </caption>
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  <th scope="col" className="px-6 py-3">
-                    Movie Name
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Genre
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Rating
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                  <th
-                    scope="row"
-                    className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    <img
-                      className="w-14 object-contain"
-                      src={movieBannerLink}
-                      alt="Jese image"
-                    />
-                    <div className="ps-3">
-                      <div className="text-base font-semibold">The Batman</div>
-                      <div className="font-normal text-gray-500">
-                        Duration: <small className="font-bold">145mins</small>
-                      </div>
-                    </div>
-                  </th>
-                  <td className="px-6 py-4">Horror, Suspense, Thriller</td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center font-bold text-danger">
-                      SPG
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="px-2 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 mr-1 fontb-bold">
-                      <MdEdit size={20} />
-                    </button>
-                    <button className="px-2 py-1 bg-green-700 text-white rounded hover:bg-green-800 mr-1 fontb-bold">
-                      <HiMiniViewfinderCircle size={20} />
-                    </button>
-                    <button className="px-2 py-1 bg-red-700 text-white rounded hover:bg-red-800 mr-1 fontb-bold">
-                      <AiFillDelete size={20} />
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            {isFetching ? (
+              <div className="flex justify-center items-center py-16">
+                <CircularProgress />
+              </div>
+            ) : error ? (
+              <div className="flex justify-center items-center py-16 text-red-500">
+                Failed to load data. Please try again later.
+              </div>
+            ) : upcomingMoviesList?.data?.length === 0 ? (
+              <div className="flex justify-center items-center py-16 text-gray-500">
+                No upcoming movies
+              </div>
+            ) : (
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <caption className="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                  Upcoming shows
+                  <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
+                    Lists of upcoming shows
+                  </p>
+                </caption>
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      Movie Name
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Genre
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Rating
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {upcomingMoviesList?.data.map((data) => (
+                    <tr
+                      key={data.id}
+                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                    >
+                      <th
+                        scope="row"
+                        className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
+                      >
+                        <img
+                          className="w-14 object-contain"
+                          src={data.image}
+                          alt={data.movie_name}
+                        />
+                        <div className="ps-3">
+                          <div className="text-base font-semibold">
+                            {data.movie_name}
+                          </div>
+                          <div className="font-normal text-gray-500">
+                            Duration:{" "}
+                            <small className="font-bold">
+                              {data.duration}mins
+                            </small>
+                          </div>
+                        </div>
+                      </th>
+                      <td className="px-6 py-4">{data.genre}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center font-bold text-danger">
+                          {data.mtrcb_rating}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <button className="px-2 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 mr-1 font-bold">
+                          <MdEdit size={20} />
+                        </button>
+                        <button className="px-2 py-1 bg-green-700 text-white rounded hover:bg-green-800 mr-1 font-bold">
+                          <HiMiniViewfinderCircle size={20} />
+                        </button>
+                        <button className="px-2 py-1 bg-red-700 text-white rounded hover:bg-red-800 mr-1 font-bold">
+                          <AiFillDelete size={20} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>
