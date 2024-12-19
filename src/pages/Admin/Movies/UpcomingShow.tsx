@@ -26,6 +26,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import CircularProgress from "@mui/material/CircularProgress";
 import { queryClient } from "../../../utils/queryClient";
+import { Pagination } from "@mui/material";
 
 const RatingText = ({ rating }: { rating: MovieRatingsType }) => {
   const color = {
@@ -52,6 +53,8 @@ const UpcomingShow = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const context = useContext(UserContext);
   const [imageUpload, setImageUpload] = useState<File | null>(null);
+  const limit = 2;
+  const [currentPage, setCurrentPage] = useState(1);
 
   const OnClickAddNewShow = () => setIsShowModal(!isShowModal);
 
@@ -61,11 +64,13 @@ const UpcomingShow = () => {
     data: upcomingMoviesList,
     isFetching,
   } = useQuery({
-    queryKey: ["upcomingMovies"],
+    queryKey: ["upcomingMovies", currentPage],
     queryFn: () =>
       GetUpcomingMoviesListApi({
         token: context.session?.acces_token ?? "",
         onTokenExpired: context.sessionExpired,
+        page: currentPage,
+        limit: limit,
       }),
   });
 
@@ -77,6 +82,7 @@ const UpcomingShow = () => {
         GetGenresListApi({
           token: context.session?.acces_token ?? "",
           onTokenExpired: context.sessionExpired,
+          page: currentPage,
         }),
     });
 
@@ -271,6 +277,18 @@ const UpcomingShow = () => {
                 </tbody>
               </table>
             )}
+
+            <div className="flex items-center justify-center p-2">
+              <Pagination
+                count={upcomingMoviesList?.totalPages ?? 0}
+                page={currentPage}
+                onChange={(_e, page) => {
+                  setCurrentPage(page);
+                }}
+                variant="outlined"
+                shape="rounded"
+              />
+            </div>
           </div>
         </div>
       </div>

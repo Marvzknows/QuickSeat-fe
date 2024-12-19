@@ -49,9 +49,10 @@ export const GetGenresListApi = async (props: RequestApi) => {
 };
 
 export const GetUpcomingMoviesListApi = async (props: RequestApi) => {
+  const { page, limit } = props;
   try {
     const response = await AxiosInstance(props).get(
-      `${BASE_URL}/api/getupcoming?limit=200&page=1`,
+      `${BASE_URL}/api/getupcoming?limit=${limit}&page=${page}`,
     );
     return response.data as UpcomingMoviesType;
   } catch (error) {

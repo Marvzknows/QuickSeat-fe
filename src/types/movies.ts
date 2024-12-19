@@ -11,6 +11,9 @@ export type MovieRatingsType = "PG" | "SPG" | "G";
 export type UpcomingMoviesType = {
   status: boolean;
   data: MoviesType[];
+  currentPage: number;
+  totalPages: number | null;
+  totalCount: number;
 };
 
 export type MoviesType = {
