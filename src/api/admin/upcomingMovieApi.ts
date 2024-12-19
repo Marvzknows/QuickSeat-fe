@@ -19,8 +19,12 @@ export const AddUpcommingApi = async (props: RequestApi) => {
   } catch (error) {
     if (axios.isCancel(error)) {
       console.error("Request canceled", error.message);
+    } else if (axios.isAxiosError(error)) {
+      if (error.response?.data && !error.response.data.isToken) {
+        props.onTokenExpired();
+      }
     } else {
-      console.error("Error:", error);
+      console.error("Unexpected error:", error);
     }
     throw error;
   }
@@ -33,8 +37,12 @@ export const GetGenresListApi = async (props: RequestApi) => {
   } catch (error) {
     if (axios.isCancel(error)) {
       console.error("Request canceled", error.message);
+    } else if (axios.isAxiosError(error)) {
+      if (error.response?.data && !error.response.data.isToken) {
+        props.onTokenExpired();
+      }
     } else {
-      console.error("Error:", error);
+      console.error("Unexpected error:", error);
     }
     throw error;
   }
@@ -49,8 +57,12 @@ export const GetUpcomingMoviesListApi = async (props: RequestApi) => {
   } catch (error) {
     if (axios.isCancel(error)) {
       console.error("Request canceled", error.message);
+    } else if (axios.isAxiosError(error)) {
+      if (error.response?.data && !error.response.data.isToken) {
+        props.onTokenExpired();
+      }
     } else {
-      console.error("Error:", error);
+      console.error("Unexpected error:", error);
     }
     throw error;
   }

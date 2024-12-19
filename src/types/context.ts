@@ -6,6 +6,9 @@ export type UserContextType = {
   saveSession: (user: UserType) => void;
   session: UserType | null;
   removeSession: () => void;
+  sessionExpired: () => void;
+  globalMessage: string | null;
+  setGlobalMessage: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 export type ContextProviderType = {

@@ -6,6 +6,8 @@ export const ratingsOption: Option[] = [
   { id: "SPG", name: "SPG" },
 ];
 
+export type MovieRatingsType = "PG" | "SPG" | "G";
+
 export type UpcomingMoviesType = {
   status: boolean;
   data: MoviesType[];
@@ -15,7 +17,7 @@ export type MoviesType = {
   id: string;
   movie_name: string;
   image: string;
-  mtrcb_rating: string;
+  mtrcb_rating: MovieRatingsType;
   genre: string;
   duration: string;
   created_at: string;

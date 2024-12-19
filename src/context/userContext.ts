@@ -7,4 +7,7 @@ export const UserContext = createContext<UserContextType>({
   saveSession: () => {},
   session: null,
   removeSession: () => {},
+  sessionExpired: () => {},
+  globalMessage: null,
+  setGlobalMessage: () => {}, // Default no-op function
 });

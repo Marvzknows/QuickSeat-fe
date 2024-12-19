@@ -18,10 +18,27 @@ import {
 import { UserContext } from "../../../context/userContext";
 import toast, { Toaster } from "react-hot-toast";
 import { Option } from "../../../types/AdminTypes/Admin";
-import { ratingsOption, UpcomingGenresType } from "../../../types/movies";
+import {
+  MovieRatingsType,
+  ratingsOption,
+  UpcomingGenresType,
+} from "../../../types/movies";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import CircularProgress from "@mui/material/CircularProgress";
 import { queryClient } from "../../../utils/queryClient";
+
+const RatingText = ({ rating }: { rating: MovieRatingsType }) => {
+  const color = {
+    G: "text-green-500",
+    PG: "text-blue-500",
+    SPG: "text-danger",
+  };
+  return (
+    <div className={`flex items-center font-bold ${color[rating]}`}>
+      {rating}
+    </div>
+  );
+};
 
 const UpcomingShow = () => {
   const [isShowModal, setIsShowModal] = useState(false);
@@ -32,7 +49,6 @@ const UpcomingShow = () => {
     mtrcb_rating: "",
     duration: "",
   });
-  // const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const context = useContext(UserContext);
   const [imageUpload, setImageUpload] = useState<File | null>(null);
@@ -49,6 +65,7 @@ const UpcomingShow = () => {
     queryFn: () =>
       GetUpcomingMoviesListApi({
         token: context.session?.acces_token ?? "",
+        onTokenExpired: context.sessionExpired,
       }),
   });
 
@@ -59,6 +76,7 @@ const UpcomingShow = () => {
       queryFn: () =>
         GetGenresListApi({
           token: context.session?.acces_token ?? "",
+          onTokenExpired: context.sessionExpired,
         }),
     });
 
@@ -75,6 +93,7 @@ const UpcomingShow = () => {
         await AddUpcommingApi({
           token: context.session?.acces_token ?? "",
           data: formData,
+          onTokenExpired: context.sessionExpired,
         });
       },
       onSuccess: () => {
@@ -234,9 +253,7 @@ const UpcomingShow = () => {
                       </th>
                       <td className="px-6 py-4">{data.genre}</td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center font-bold text-danger">
-                          {data.mtrcb_rating}
-                        </div>
+                        <RatingText rating={data.mtrcb_rating} />
                       </td>
                       <td className="px-6 py-4">
                         <button className="px-2 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 mr-1 font-bold">

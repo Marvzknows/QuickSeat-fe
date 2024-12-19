@@ -7,11 +7,13 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { MdArrowDropDown, MdArrowDropUp } from "react-icons/md";
 import { IoMdMenu } from "react-icons/io";
 import { UserContext } from "../../../context/userContext";
+import SessionExpireModal from "../../../components/modals/SessionExpire";
 
 const AdminLayout = () => {
   const [isShowDropdown, setIsShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { toggleSidebar, removeSession } = useContext(UserContext);
+  const { toggleSidebar, removeSession, globalMessage } =
+    useContext(UserContext);
 
   // const handleLogout = () => {
   //   removeSession();
@@ -117,6 +119,8 @@ const AdminLayout = () => {
         </div>
 
         <Outlet />
+        {/* SESSION EXPIRED ALERT */}
+        {globalMessage && <SessionExpireModal />}
       </main>
     </div>
   );
