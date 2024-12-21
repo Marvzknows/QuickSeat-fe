@@ -1,6 +1,5 @@
 import { MdAdd, MdEdit } from "react-icons/md";
 import Button from "../../../components/buttons/Buttons";
-import SectionHeader from "../../../components/Headers/AdminHeaders";
 import AdminContainer from "../../Layout/AdminLayout/AdminContainer";
 import { HiMiniViewfinderCircle } from "react-icons/hi2";
 import { AiFillDelete } from "react-icons/ai";
@@ -54,7 +53,6 @@ const UpcomingShow = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const context = useContext(UserContext);
   const [imageUpload, setImageUpload] = useState<File | null>(null);
-  const limit = 2;
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
 
@@ -72,7 +70,7 @@ const UpcomingShow = () => {
         token: context.session?.acces_token ?? "",
         onTokenExpired: context.sessionExpired,
         page: currentPage,
-        limit: limit,
+        limit: 5,
         search: search,
       }),
   });
@@ -182,19 +180,17 @@ const UpcomingShow = () => {
   };
 
   return (
-    <AdminContainer>
-      <SectionHeader
-        children={"Admin / Movies"}
-        currentPage={"Upcoming show"}
-      />
-
-      {/* Make this div grow to fill remaining space use flex-grow flex */}
-      <div className="flex-grow flex flex-col">
-        <div className="w-full h-full flex flex-col p-2.5 bg-white rounded-lg shadow border border-neutral-200 overflow-auto">
-          <div className="flex items-center w-full">
+    <AdminContainer
+      className="py-4"
+      sectionHeaderChildren={"Admin / Movies"}
+      sectionHeaderCurrentPage={"Upcoming show"}
+    >
+      <div className=" flex flex-col">
+        <div className="min-max w-full overflow-x-auto rounded-xl bg-white shadow-none max-h-[calc(100vh-180px)]">
+          <div className="flex justify-end px-3 items-center w-full">
             <Button
               onClick={OnClickAddNewShow}
-              className="ml-auto flex items-center gap-2-"
+              className="flex items-center gap-2-"
             >
               <MdAdd size={18} /> Add New Show
             </Button>
