@@ -20,7 +20,7 @@ export const AddUpcommingApi = async (props: RequestApi) => {
     if (axios.isCancel(error)) {
       console.error("Request canceled", error.message);
     } else if (axios.isAxiosError(error)) {
-      if (error.response?.data && !error.response.data.isToken) {
+      if (error.response?.data && error.response.data.isToken) {
         props.onTokenExpired();
       }
     } else {
@@ -49,17 +49,17 @@ export const GetGenresListApi = async (props: RequestApi) => {
 };
 
 export const GetUpcomingMoviesListApi = async (props: RequestApi) => {
-  const { page, limit } = props;
+  const { page, limit, search } = props;
   try {
     const response = await AxiosInstance(props).get(
-      `${BASE_URL}/api/getupcoming?limit=${limit}&page=${page}`,
+      `${BASE_URL}/api/getupcoming?limit=${limit}&page=${page}&search=${search}`,
     );
     return response.data as UpcomingMoviesType;
   } catch (error) {
     if (axios.isCancel(error)) {
       console.error("Request canceled", error.message);
     } else if (axios.isAxiosError(error)) {
-      if (error.response?.data && !error.response.data.isToken) {
+      if (error.response?.data && error.response.data.isToken) {
         props.onTokenExpired();
       }
     } else {

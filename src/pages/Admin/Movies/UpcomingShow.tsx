@@ -27,6 +27,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import CircularProgress from "@mui/material/CircularProgress";
 import { queryClient } from "../../../utils/queryClient";
 import { Pagination } from "@mui/material";
+import { IoIosSearch } from "react-icons/io";
 
 const RatingText = ({ rating }: { rating: MovieRatingsType }) => {
   const color = {
@@ -55,6 +56,7 @@ const UpcomingShow = () => {
   const [imageUpload, setImageUpload] = useState<File | null>(null);
   const limit = 2;
   const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
 
   const OnClickAddNewShow = () => setIsShowModal(!isShowModal);
 
@@ -64,13 +66,14 @@ const UpcomingShow = () => {
     data: upcomingMoviesList,
     isFetching,
   } = useQuery({
-    queryKey: ["upcomingMovies", currentPage],
+    queryKey: ["upcomingMovies", currentPage, search],
     queryFn: () =>
       GetUpcomingMoviesListApi({
         token: context.session?.acces_token ?? "",
         onTokenExpired: context.sessionExpired,
         page: currentPage,
         limit: limit,
+        search: search,
       }),
   });
 
@@ -171,6 +174,10 @@ const UpcomingShow = () => {
 
   const HandleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    if (name === "search") {
+      setSearch(value);
+      setCurrentPage(1);
+    }
     setUploadData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -193,7 +200,17 @@ const UpcomingShow = () => {
             </Button>
           </div>
 
-          <div className="relative overflow-x-auto sm:rounded-lg">
+          <div className="relative overflow-x-auto sm:rounded-lg flex flex-col flex-grow">
+            <InputField
+              leftIcon={
+                <IoIosSearch className="cursor-pointer hover:text-slate-700" />
+              }
+              className="w-80 ml-auto"
+              placeholder="Search movie...."
+              value={search}
+              name="search"
+              onChange={HandleOnchange}
+            />
             {isFetching ? (
               <div className="flex justify-center items-center py-16">
                 <CircularProgress />
@@ -207,8 +224,8 @@ const UpcomingShow = () => {
                 No upcoming movies
               </div>
             ) : (
-              <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <caption className="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <caption className="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
                   Upcoming shows
                   <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
                     Lists of upcoming shows
@@ -278,8 +295,9 @@ const UpcomingShow = () => {
               </table>
             )}
 
-            <div className="flex items-center justify-center p-2">
+            <div className="flex items-center justify-end p-2 mt-auto">
               <Pagination
+                disabled={isFetching || isSubmitting}
                 count={upcomingMoviesList?.totalPages ?? 0}
                 page={currentPage}
                 onChange={(_e, page) => {
