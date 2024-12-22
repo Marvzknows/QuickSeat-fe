@@ -181,129 +181,122 @@ const UpcomingShow = () => {
 
   return (
     <AdminContainer
-      className="py-4"
+      className="bg-inherit overflow-auto"
       sectionHeaderChildren={"Admin / Movies"}
       sectionHeaderCurrentPage={"Upcoming show"}
     >
-      <div className=" flex flex-col">
-        <div className="min-max w-full overflow-x-auto rounded-xl bg-white shadow-none max-h-[calc(100vh-180px)]">
-          <div className="flex justify-end px-3 items-center w-full">
-            <Button
-              onClick={OnClickAddNewShow}
-              className="flex items-center gap-2-"
-            >
-              <MdAdd size={18} /> Add New Show
-            </Button>
+      <div className="flex h-full flex-col bg-white relative overflow-x-auto sm:rounded-lg border border-neutral-200 shadow">
+        <div className="flex justify-end px-3 py-2 items-center w-full">
+          <Button
+            onClick={OnClickAddNewShow}
+            className="flex items-center gap-2-"
+          >
+            <MdAdd size={18} /> Add New Show
+          </Button>
+        </div>
+        <InputField
+          leftIcon={
+            <IoIosSearch className="cursor-pointer hover:text-slate-700" />
+          }
+          className="w-80 ml-auto"
+          placeholder="Search movie...."
+          value={search}
+          name="search"
+          onChange={HandleOnchange}
+        />
+        {isFetching ? (
+          <div className="flex justify-center items-center py-16">
+            <CircularProgress />
           </div>
-
-          <div className="relative overflow-x-auto sm:rounded-lg flex flex-col flex-grow">
-            <InputField
-              leftIcon={
-                <IoIosSearch className="cursor-pointer hover:text-slate-700" />
-              }
-              className="w-80 ml-auto"
-              placeholder="Search movie...."
-              value={search}
-              name="search"
-              onChange={HandleOnchange}
-            />
-            {isFetching ? (
-              <div className="flex justify-center items-center py-16">
-                <CircularProgress />
-              </div>
-            ) : error ? (
-              <div className="flex justify-center items-center py-16 text-red-500">
-                Failed to load data. Please try again later.
-              </div>
-            ) : upcomingMoviesList?.data?.length === 0 ? (
-              <div className="flex justify-center items-center py-16 text-gray-500">
-                No upcoming movies
-              </div>
-            ) : (
-              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <caption className="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-                  Upcoming shows
-                  <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-                    Lists of upcoming shows
-                  </p>
-                </caption>
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                  <tr>
-                    <th scope="col" className="px-6 py-3">
-                      Movie Name
-                    </th>
-                    <th scope="col" className="px-6 py-3">
-                      Genre
-                    </th>
-                    <th scope="col" className="px-6 py-3">
-                      Rating
-                    </th>
-                    <th scope="col" className="px-6 py-3">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {upcomingMoviesList?.data.map((data) => (
-                    <tr
-                      key={data.id}
-                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                    >
-                      <th
-                        scope="row"
-                        className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
-                      >
-                        <img
-                          className="w-14 object-contain"
-                          src={data.image}
-                          alt={data.movie_name}
-                        />
-                        <div className="ps-3">
-                          <div className="text-base font-semibold">
-                            {data.movie_name}
-                          </div>
-                          <div className="font-normal text-gray-500">
-                            Duration:{" "}
-                            <small className="font-bold">
-                              {data.duration}mins
-                            </small>
-                          </div>
-                        </div>
-                      </th>
-                      <td className="px-6 py-4">{data.genre}</td>
-                      <td className="px-6 py-4">
-                        <RatingText rating={data.mtrcb_rating} />
-                      </td>
-                      <td className="px-6 py-4">
-                        <button className="px-2 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 mr-1 font-bold">
-                          <MdEdit size={20} />
-                        </button>
-                        <button className="px-2 py-1 bg-green-700 text-white rounded hover:bg-green-800 mr-1 font-bold">
-                          <HiMiniViewfinderCircle size={20} />
-                        </button>
-                        <button className="px-2 py-1 bg-red-700 text-white rounded hover:bg-red-800 mr-1 font-bold">
-                          <AiFillDelete size={20} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-
-            <div className="flex items-center justify-end p-2 mt-auto">
-              <Pagination
-                disabled={isFetching || isSubmitting}
-                count={upcomingMoviesList?.totalPages ?? 0}
-                page={currentPage}
-                onChange={(_e, page) => {
-                  setCurrentPage(page);
-                }}
-                variant="outlined"
-                shape="rounded"
-              />
-            </div>
+        ) : error ? (
+          <div className="flex justify-center items-center py-16 text-red-500">
+            Failed to load data. Please try again later.
           </div>
+        ) : upcomingMoviesList?.data?.length === 0 ? (
+          <div className="flex justify-center items-center py-16 text-gray-500">
+            No upcoming movies
+          </div>
+        ) : (
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <caption className="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+              Upcoming shows
+              <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
+                Lists of upcoming shows
+              </p>
+            </caption>
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  Movie Name
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Genre
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Rating
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {upcomingMoviesList?.data.map((data) => (
+                <tr
+                  key={data.id}
+                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                >
+                  <th
+                    scope="row"
+                    className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
+                  >
+                    <img
+                      className="w-14 object-contain"
+                      src={data.image}
+                      alt={data.movie_name}
+                    />
+                    <div className="ps-3">
+                      <div className="text-base font-semibold">
+                        {data.movie_name}
+                      </div>
+                      <div className="font-normal text-gray-500">
+                        Duration:{" "}
+                        <small className="font-bold">{data.duration}mins</small>
+                      </div>
+                    </div>
+                  </th>
+                  <td className="px-6 py-4">{data.genre}</td>
+                  <td className="px-6 py-4">
+                    <RatingText rating={data.mtrcb_rating} />
+                  </td>
+                  <td className="px-6 py-4">
+                    <button className="px-2 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 mr-1 font-bold">
+                      <MdEdit size={20} />
+                    </button>
+                    <button className="px-2 py-1 bg-green-700 text-white rounded hover:bg-green-800 mr-1 font-bold">
+                      <HiMiniViewfinderCircle size={20} />
+                    </button>
+                    <button className="px-2 py-1 bg-red-700 text-white rounded hover:bg-red-800 mr-1 font-bold">
+                      <AiFillDelete size={20} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        <div className="flex items-center justify-end p-2 mt-auto">
+          <Pagination
+            disabled={isFetching || isSubmitting}
+            count={upcomingMoviesList?.totalPages ?? 0}
+            page={currentPage}
+            onChange={(_e, page) => {
+              setCurrentPage(page);
+            }}
+            variant="outlined"
+            shape="rounded"
+          />
         </div>
       </div>
 

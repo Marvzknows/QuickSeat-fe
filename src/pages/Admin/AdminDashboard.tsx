@@ -39,11 +39,11 @@ const AdminDashboard = () => {
   return (
     <>
       <AdminContainer
-        className="bg-transparent"
+        className="bg-inherit overflow-auto"
         sectionHeaderChildren={"Admin"}
         sectionHeaderCurrentPage={"Dashboard"}
       >
-        <div className="flex flex-col md:flex-row gap-2">
+        <div className="flex flex-col md:flex-row gap-2 ">
           <div className="w-full md:w-[60%] md:min-h-[500px] flex flex-col justify-center items-center bg-white rounded-lg shadow border border-neutral-200">
             <div className="w-full px-7 py-4 ">
               <p className="text-neutral-600 font-medium">
