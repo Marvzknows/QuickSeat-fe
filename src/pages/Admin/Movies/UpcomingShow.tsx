@@ -11,6 +11,7 @@ import MultiSelectDropdown from "../../../components/dropdown/MultiSelect";
 import SelectDropdown from "../../../components/dropdown/SelectDropdown";
 import {
   AddUpcommingApi,
+  DeleteUpcomingMovieApi,
   GetGenresListApi,
   GetUpcomingMoviesListApi,
 } from "../../../api/admin/upcomingMovieApi";
@@ -27,6 +28,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { queryClient } from "../../../utils/queryClient";
 import { Pagination } from "@mui/material";
 import { IoIosSearch } from "react-icons/io";
+import Swal from "sweetalert2";
 
 const RatingText = ({ rating }: { rating: MovieRatingsType }) => {
   const color = {
@@ -123,6 +125,23 @@ const UpcomingShow = () => {
       },
     });
 
+  // Delete Upcoming Movie
+  const { mutateAsync: deleteUpcomingMutation, isPending: isDeleting } =
+    useMutation({
+      mutationFn: async (id: string) => {
+        await DeleteUpcomingMovieApi({
+          token: context.session?.acces_token ?? "",
+          onTokenExpired: context.sessionExpired,
+          endPoint: id,
+        });
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["upcomingMovies"] });
+        toast.success("Movie deleted successfully");
+      },
+      onError: (err) => toast.error(`Error deleting movie: ${err}`),
+    });
+
   const HandleOnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -179,6 +198,22 @@ const UpcomingShow = () => {
     setUploadData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const HandleDelete = (id: string) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Delete",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteUpcomingMutation(id);
+      }
+    });
+  };
+
   return (
     <AdminContainer
       className="overflow-auto"
@@ -188,6 +223,7 @@ const UpcomingShow = () => {
       <div className="flex h-full flex-col bg-white relative overflow-x-auto sm:rounded-lg border border-neutral-200 shadow">
         <div className="flex justify-end px-3 py-2 items-center w-full">
           <Button
+            disabled={isDeleting || isFetching || isSubmitting}
             onClick={OnClickAddNewShow}
             className="flex items-center gap-2-"
           >
@@ -203,6 +239,7 @@ const UpcomingShow = () => {
           value={search}
           name="search"
           onChange={HandleOnchange}
+          disabled={isDeleting || isSubmitting}
         />
         {isFetching ? (
           <div className="flex justify-center items-center py-16">
@@ -270,13 +307,23 @@ const UpcomingShow = () => {
                     <RatingText rating={data.mtrcb_rating} />
                   </td>
                   <td className="px-6 py-4">
-                    <button className="px-2 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 mr-1 font-bold">
+                    <button
+                      disabled={isDeleting}
+                      className="px-2 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 mr-1 font-bold disabled:bg-blue-300"
+                    >
                       <MdEdit size={20} />
                     </button>
-                    <button className="px-2 py-1 bg-green-700 text-white rounded hover:bg-green-800 mr-1 font-bold">
+                    <button
+                      disabled={isDeleting}
+                      className="px-2 py-1 bg-green-700 text-white rounded hover:bg-green-800 mr-1 font-bold disabled:bg-green-400"
+                    >
                       <HiMiniViewfinderCircle size={20} />
                     </button>
-                    <button className="px-2 py-1 bg-red-700 text-white rounded hover:bg-red-800 mr-1 font-bold">
+                    <button
+                      disabled={isDeleting}
+                      onClick={() => HandleDelete(data.id)}
+                      className="px-2 py-1 bg-red-700 text-white rounded hover:bg-red-800 mr-1 font-bold disabled:bg-red-300"
+                    >
                       <AiFillDelete size={20} />
                     </button>
                   </td>
@@ -288,7 +335,7 @@ const UpcomingShow = () => {
 
         <div className="flex items-center justify-end p-2 mt-auto">
           <Pagination
-            disabled={isFetching || isSubmitting}
+            disabled={isFetching || isSubmitting || isDeleting}
             count={upcomingMoviesList?.totalPages ?? 0}
             page={currentPage}
             onChange={(_e, page) => {
