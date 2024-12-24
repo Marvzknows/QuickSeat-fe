@@ -39,7 +39,7 @@ const AdminDashboard = () => {
   return (
     <>
       <AdminContainer
-        className="bg-inherit overflow-auto"
+        className="overflow-auto"
         sectionHeaderChildren={"Admin"}
         sectionHeaderCurrentPage={"Dashboard"}
       >

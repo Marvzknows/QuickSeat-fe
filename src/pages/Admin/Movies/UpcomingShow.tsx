@@ -181,7 +181,7 @@ const UpcomingShow = () => {
 
   return (
     <AdminContainer
-      className="bg-inherit overflow-auto"
+      className="overflow-auto"
       sectionHeaderChildren={"Admin / Movies"}
       sectionHeaderCurrentPage={"Upcoming show"}
     >
