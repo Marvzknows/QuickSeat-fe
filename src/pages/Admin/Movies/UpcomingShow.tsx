@@ -1,7 +1,6 @@
 import { MdAdd, MdEdit } from "react-icons/md";
 import Button from "../../../components/buttons/Buttons";
 import AdminContainer from "../../Layout/AdminLayout/AdminContainer";
-import { HiMiniViewfinderCircle } from "react-icons/hi2";
 import { AiFillDelete } from "react-icons/ai";
 import { useContext, useEffect, useState } from "react";
 import ImageUpload from "../../../components/input/FileInput";
@@ -12,6 +11,7 @@ import SelectDropdown from "../../../components/dropdown/SelectDropdown";
 import {
   AddUpcommingApi,
   DeleteUpcomingMovieApi,
+  EditUpcomingMovieApi,
   GetGenresListApi,
   GetUpcomingMoviesListApi,
 } from "../../../api/admin/upcomingMovieApi";
@@ -43,12 +43,21 @@ const RatingText = ({ rating }: { rating: MovieRatingsType }) => {
   );
 };
 
+type EditData = {
+  id: string;
+  movie_name: string;
+  mtrcb_rating: string;
+  duration: string;
+  genre: string;
+  image: string;
+};
+
 const UpcomingShow = () => {
   const [isShowModal, setIsShowModal] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<Option[]>([]); // split when passing as payload
   const [options, setOptions] = useState<Option[]>([]);
   const [uploadData, setUploadData] = useState({
-    movie_name: "The batman",
+    movie_name: "",
     mtrcb_rating: "",
     duration: "",
   });
@@ -57,8 +66,22 @@ const UpcomingShow = () => {
   const [imageUpload, setImageUpload] = useState<File | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [isEdit, setIsEdit] = useState(false);
+  const [editData, setEditData] = useState<EditData>({
+    id: "",
+    movie_name: "",
+    mtrcb_rating: "",
+    duration: "",
+    genre: "",
+    image: "",
+  });
 
-  const OnClickAddNewShow = () => setIsShowModal(!isShowModal);
+  const OnClickAddNewShow = () => {
+    setIsEdit(false);
+    setIsShowModal(!isShowModal);
+  };
+
+  // #region REACT QUERY AND MUTATIONS
 
   // Fetch Upcoming List
   const {
@@ -125,6 +148,39 @@ const UpcomingShow = () => {
       },
     });
 
+  // Edit Upcoming Movie
+  const { mutateAsync: editUpcomingMutation, isPending: isEditing } =
+    useMutation({
+      mutationFn: async (formData: FormData) => {
+        await EditUpcomingMovieApi({
+          token: context.session?.acces_token ?? "",
+          data: formData,
+          onTokenExpired: context.sessionExpired,
+        });
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["upcomingMovies"],
+        });
+
+        setIsShowModal(false);
+        setEditData({
+          id: "",
+          movie_name: "",
+          mtrcb_rating: "",
+          duration: "",
+          genre: "",
+          image: "",
+        });
+        setSelectedGenre([]);
+        setErrorMessage("");
+        toast.success("Successfully modified upcoming movie");
+      },
+      onError: (err) => {
+        toast.success(`${err}: Error editing upcoming movie`);
+      },
+    });
+
   // Delete Upcoming Movie
   const { mutateAsync: deleteUpcomingMutation, isPending: isDeleting } =
     useMutation({
@@ -141,21 +197,17 @@ const UpcomingShow = () => {
       },
       onError: (err) => toast.error(`Error deleting movie: ${err}`),
     });
+  //#endregion
 
-  const HandleOnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const HandleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const { movie_name, mtrcb_rating, duration } = uploadData;
+    const data = isEdit ? editData : uploadData;
+    const { movie_name, mtrcb_rating, duration } = data;
 
     if (!context.session) return;
 
-    if (
-      !imageUpload ||
-      !selectedGenre ||
-      !movie_name ||
-      !mtrcb_rating ||
-      !duration
-    ) {
+    if (!selectedGenre || !movie_name || !mtrcb_rating || !duration) {
       setErrorMessage("All Fields are Required");
       return;
     }
@@ -163,16 +215,37 @@ const UpcomingShow = () => {
     const splitGenre = selectedGenre.map((data) => data.name).join(", "); // split when passing as payload
 
     const formData = new FormData();
+    if (isEdit) {
+      formData.append("id", editData.id);
+    }
     formData.append("movie_name", movie_name);
-    formData.append("image", imageUpload);
+
+    // Only append image if imageUpload is not null
+    if (!isEdit && !imageUpload) {
+      console.log("not edit");
+      setErrorMessage("Movie Poster is required");
+      return;
+    }
+
+    if (imageUpload) {
+      formData.append("image", imageUpload);
+    }
+
     formData.append("mtrcb_rating", mtrcb_rating);
     formData.append("genre", splitGenre);
     formData.append("duration", duration);
 
+    if (isEdit) {
+      await editUpcomingMutation(formData);
+      return;
+    }
     await addUpcomingMutation(formData);
   };
 
   const HandleOnchangeSelect = (option: Option) => {
+    if (isEdit) {
+      setEditData((prev) => ({ ...prev, mtrcb_rating: option.name }));
+    }
     setUploadData((prev) => ({ ...prev, mtrcb_rating: option.name }));
   };
 
@@ -195,7 +268,12 @@ const UpcomingShow = () => {
       setSearch(value);
       setCurrentPage(1);
     }
-    setUploadData((prev) => ({ ...prev, [name]: value }));
+
+    if (isEdit) {
+      setEditData((prev) => ({ ...prev, [name]: value }));
+    } else {
+      setUploadData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const HandleDelete = (id: string) => {
@@ -214,6 +292,19 @@ const UpcomingShow = () => {
     });
   };
 
+  const HandleEdit = (editData: EditData) => {
+    if (!editData) return;
+    const populateSelectedGenre = editData.genre.split(", ").map((genre) => ({
+      id: genre,
+      name: genre,
+    }));
+    setIsShowModal(true);
+    setIsEdit(true);
+    setEditData({ ...editData });
+    setSelectedGenre(populateSelectedGenre);
+    setImageUpload(null);
+  };
+
   return (
     <AdminContainer
       className="overflow-auto"
@@ -223,7 +314,7 @@ const UpcomingShow = () => {
       <div className="flex h-full flex-col bg-white relative overflow-x-auto sm:rounded-lg border border-neutral-200 shadow">
         <div className="flex justify-end px-3 py-2 items-center w-full">
           <Button
-            disabled={isDeleting || isFetching || isSubmitting}
+            disabled={isDeleting || isFetching || isSubmitting || isEditing}
             onClick={OnClickAddNewShow}
             className="flex items-center gap-2-"
           >
@@ -239,7 +330,7 @@ const UpcomingShow = () => {
           value={search}
           name="search"
           onChange={HandleOnchange}
-          disabled={isDeleting || isSubmitting}
+          disabled={isDeleting || isSubmitting || isEditing}
         />
         {isFetching ? (
           <div className="flex justify-center items-center py-16">
@@ -308,16 +399,11 @@ const UpcomingShow = () => {
                   </td>
                   <td className="px-6 py-4">
                     <button
+                      onClick={() => HandleEdit(data)}
                       disabled={isDeleting}
                       className="px-2 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 mr-1 font-bold disabled:bg-blue-300"
                     >
                       <MdEdit size={20} />
-                    </button>
-                    <button
-                      disabled={isDeleting}
-                      className="px-2 py-1 bg-green-700 text-white rounded hover:bg-green-800 mr-1 font-bold disabled:bg-green-400"
-                    >
-                      <HiMiniViewfinderCircle size={20} />
                     </button>
                     <button
                       disabled={isDeleting}
@@ -335,7 +421,7 @@ const UpcomingShow = () => {
 
         <div className="flex items-center justify-end p-2 mt-auto">
           <Pagination
-            disabled={isFetching || isSubmitting || isDeleting}
+            disabled={isFetching || isSubmitting || isDeleting || isEditing}
             count={upcomingMoviesList?.totalPages ?? 0}
             page={currentPage}
             onChange={(_e, page) => {
@@ -349,27 +435,36 @@ const UpcomingShow = () => {
 
       {isShowModal && (
         <FormModal
-          onSubmit={HandleOnSubmit}
+          onSubmit={HandleSubmit}
           onClose={() => {
-            if (isSubmitting) return;
+            if (isSubmitting || isEditing) return;
+            setErrorMessage("");
             setIsShowModal(false);
             setImageUpload(null);
+            setSelectedGenre([]);
+            setUploadData({ movie_name: "", mtrcb_rating: "", duration: "" });
+            setEditData((prev) => ({ ...prev, image: "" })); // Clear preview on close
           }}
           title="Add new show"
           errorMessage={errorMessage}
-          isLoading={isSubmitting}
+          isLoading={isSubmitting || isEditing}
         >
           <div className="flex flex-col w-full  border-danger">
             <ImageUpload
               name="image"
               id="image"
               setImageUpload={setImageUpload}
+              propsImagePreview={isEdit ? editData.image : null}
+              removePropsImagePreview={() =>
+                setEditData((prev) => ({ ...prev, image: "" }))
+              }
             />
             <InputField
               name="movie_name"
               id="movie_name"
               className="mt-5"
               label="Movie name"
+              value={isEdit ? editData.movie_name : uploadData.movie_name}
               onChange={HandleOnchange}
             />
             <div className="flex flex-col md:flex-row items-center">
@@ -384,7 +479,7 @@ const UpcomingShow = () => {
                 handleOnchange={HandleOnchangeSelect}
                 label="Rating"
                 options={ratingsOption}
-                value={uploadData.mtrcb_rating}
+                value={isEdit ? editData.mtrcb_rating : uploadData.mtrcb_rating}
                 className="w-full"
               />
               <InputField
@@ -393,6 +488,7 @@ const UpcomingShow = () => {
                 className="w-full"
                 label="Movie Duration"
                 type="number"
+                value={isEdit ? editData.duration : uploadData.duration}
                 onChange={HandleOnchange}
               />
             </div>
