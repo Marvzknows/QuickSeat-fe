@@ -3,7 +3,6 @@ import AdminBarChart from "../../components/charts/Barchart";
 import AdminContainer from "../Layout/AdminLayout/AdminContainer";
 import { FaList } from "react-icons/fa";
 import { ListButtonProps } from "../../types/AdminTypes/Admin";
-import SectionHeader from "../../components/Headers/AdminHeaders";
 
 const ListButton = ({ text, onChangeHandler, isActive }: ListButtonProps) => {
   return (
@@ -38,72 +37,78 @@ const AdminDashboard = () => {
   };
 
   return (
-    <AdminContainer>
-      <SectionHeader children={"Admin"} currentPage={"Dashboard"} />
-
-      <div className="flex flex-col md:flex-row gap-2">
-        <div className="w-full md:w-[60%] md:min-h-[500px] flex flex-col justify-center items-center bg-white rounded-lg shadow border border-neutral-200">
-          <div className="w-full px-7 py-4 ">
-            <p className="text-neutral-600 font-medium">
-              <span className="font-bold">( Now Showing )</span> Revenue and
-              Ticket Sales Overview
-            </p>
-          </div>
-          <AdminBarChart />
-        </div>
-
-        <div className="w-full md:w-[40%] p-2 bg-white rounded-lg shadow border border-neutral-200">
-          <div className="p-2 font-semibold text-slate-700 flex items-center gap-2">
-            <FaList size={14} /> Movies List
-          </div>
-          <div className="flex items-center">
-            <ListButton
-              onChangeHandler={() => HandleOnchangeList("nowShowing")}
-              text="Now Showing"
-              isActive={activeList.nowShowing}
-            />
-            <ListButton
-              onChangeHandler={() => HandleOnchangeList("upcoming")}
-              text="Upcoming Showing"
-              isActive={activeList.upcoming}
-            />
+    <>
+      <AdminContainer
+        className="overflow-auto"
+        sectionHeaderChildren={"Admin"}
+        sectionHeaderCurrentPage={"Dashboard"}
+      >
+        <div className="flex flex-col md:flex-row gap-2 ">
+          <div className="w-full md:w-[60%] md:min-h-[500px] flex flex-col justify-center items-center bg-white rounded-lg shadow border border-neutral-200">
+            <div className="w-full px-7 py-4 ">
+              <p className="text-neutral-600 font-medium">
+                <span className="font-bold">( Now Showing )</span> Revenue and
+                Ticket Sales Overview
+              </p>
+            </div>
+            <AdminBarChart />
           </div>
 
-          <div className="list_container max-h-[400px] overflow-y-auto">
-            {data.map((item) => (
-              <div
-                key={item}
-                className="border-b-2 flex flex-row gap-2 text-sm p-2"
-              >
-                <img width={50} src={movieBannerLink} />
+          <div className="w-full md:w-[40%] p-2 bg-white rounded-lg shadow border border-neutral-200">
+            <div className="p-2 font-semibold text-slate-700 flex items-center gap-2">
+              <FaList size={14} /> Movies List
+            </div>
+            <div className="flex items-center">
+              <ListButton
+                onChangeHandler={() => HandleOnchangeList("nowShowing")}
+                text="Now Showing"
+                isActive={activeList.nowShowing}
+              />
+              <ListButton
+                onChangeHandler={() => HandleOnchangeList("upcoming")}
+                text="Upcoming Showing"
+                isActive={activeList.upcoming}
+              />
+            </div>
 
-                <div className="flex flex-col items-start justify-around px-2">
-                  <p className="font-bold text-md text-slate-800">The Batman</p>
-                  <p className="text-slate-500">
-                    Rating: <span className="text-success font-bold">PG</span>
-                  </p>
-                  <p className="text-slate-500">
-                    Duration:
-                    <span className="text-slate-800 font-bold px-1">
-                      145mins
-                    </span>
-                  </p>
+            <div className="list_container max-h-[400px] overflow-y-auto">
+              {data.map((item) => (
+                <div
+                  key={item}
+                  className="border-b-2 flex flex-row gap-2 text-sm p-2"
+                >
+                  <img width={50} src={movieBannerLink} />
+
+                  <div className="flex flex-col items-start justify-around px-2">
+                    <p className="font-bold text-md text-slate-800">
+                      The Batman
+                    </p>
+                    <p className="text-slate-500">
+                      Rating: <span className="text-success font-bold">PG</span>
+                    </p>
+                    <p className="text-slate-500">
+                      Duration:
+                      <span className="text-slate-800 font-bold px-1">
+                        145mins
+                      </span>
+                    </p>
+                  </div>
+
+                  <div className="ml-auto my-auto pr-4">
+                    <p className="text-slate-500">
+                      Ticket Sold:{" "}
+                      <span className="text-slate-800 font-bold px-1">
+                        ₱1,400.00
+                      </span>
+                    </p>
+                  </div>
                 </div>
-
-                <div className="ml-auto my-auto pr-4">
-                  <p className="text-slate-500">
-                    Ticket Sold:{" "}
-                    <span className="text-slate-800 font-bold px-1">
-                      ₱1,400.00
-                    </span>
-                  </p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    </AdminContainer>
+      </AdminContainer>
+    </>
   );
 };
 

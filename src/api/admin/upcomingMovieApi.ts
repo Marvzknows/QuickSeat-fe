@@ -19,8 +19,12 @@ export const AddUpcommingApi = async (props: RequestApi) => {
   } catch (error) {
     if (axios.isCancel(error)) {
       console.error("Request canceled", error.message);
+    } else if (axios.isAxiosError(error)) {
+      if (error.response?.data && error.response.data.isToken) {
+        props.onTokenExpired();
+      }
     } else {
-      console.error("Error:", error);
+      console.error("Unexpected error:", error);
     }
     throw error;
   }
@@ -33,24 +37,81 @@ export const GetGenresListApi = async (props: RequestApi) => {
   } catch (error) {
     if (axios.isCancel(error)) {
       console.error("Request canceled", error.message);
+    } else if (axios.isAxiosError(error)) {
+      if (error.response?.data && !error.response.data.isToken) {
+        props.onTokenExpired();
+      }
     } else {
-      console.error("Error:", error);
+      console.error("Unexpected error:", error);
     }
     throw error;
   }
 };
 
 export const GetUpcomingMoviesListApi = async (props: RequestApi) => {
+  const { page, limit, search } = props;
   try {
     const response = await AxiosInstance(props).get(
-      `${BASE_URL}/api/getupcoming?limit=200&page=1`,
+      `${BASE_URL}/api/getupcoming?limit=${limit}&page=${page}&search=${search}`,
     );
     return response.data as UpcomingMoviesType;
   } catch (error) {
     if (axios.isCancel(error)) {
       console.error("Request canceled", error.message);
+    } else if (axios.isAxiosError(error)) {
+      if (error.response?.data && error.response.data.isToken) {
+        props.onTokenExpired();
+      }
     } else {
-      console.error("Error:", error);
+      console.error("Unexpected error:", error);
+    }
+    throw error;
+  }
+};
+
+export const DeleteUpcomingMovieApi = async (props: RequestApi) => {
+  const { endPoint } = props;
+  try {
+    const response = await AxiosInstance(props).delete(
+      `${BASE_URL}/api/deleteupcoming/${endPoint}`,
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.error("Request canceled", error.message);
+    } else if (axios.isAxiosError(error)) {
+      if (error.response?.data && error.response.data.isToken) {
+        props.onTokenExpired();
+      }
+    } else {
+      console.error("Unexpected error:", error);
+    }
+    throw error;
+  }
+};
+
+export const EditUpcomingMovieApi = async (props: RequestApi) => {
+  const { signal, data } = props;
+  const axiosInstance = AxiosInstance(props);
+
+  try {
+    const response = await axiosInstance.put(
+      `${BASE_URL}/api/updateupcoming`,
+      data,
+      {
+        signal,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.error("Request canceled", error.message);
+    } else if (axios.isAxiosError(error)) {
+      if (error.response?.data && error.response.data.isToken) {
+        props.onTokenExpired();
+      }
+    } else {
+      console.error("Unexpected error:", error);
     }
     throw error;
   }

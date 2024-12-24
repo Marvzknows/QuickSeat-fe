@@ -4,9 +4,16 @@ import Button from "../buttons/Buttons";
 
 type ImageUploadProps = React.InputHTMLAttributes<HTMLInputElement> & {
   setImageUpload: React.Dispatch<React.SetStateAction<File | null>>;
+  propsImagePreview?: string | null;
+  removePropsImagePreview?: () => void;
 };
 
-const ImageUpload = ({ setImageUpload, ...props }: ImageUploadProps) => {
+const ImageUpload = ({
+  setImageUpload,
+  propsImagePreview,
+  removePropsImagePreview,
+  ...props
+}: ImageUploadProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -27,15 +34,18 @@ const ImageUpload = ({ setImageUpload, ...props }: ImageUploadProps) => {
   const handleRemoveImage = () => {
     setImagePreview(null);
     setImageUpload(null);
+    if (removePropsImagePreview) {
+      removePropsImagePreview();
+    }
   };
 
   return (
     <div className="flex items-center justify-center h-72 w-64 border-2 border-dashed border-gray-300 rounded-lg mx-auto">
-      {imagePreview ? (
+      {imagePreview || propsImagePreview ? (
         <div className="relative w-full h-full">
           <img
             className="w-full h-full object-cover object-center"
-            src={imagePreview ?? ""}
+            src={(propsImagePreview ?? "") || (imagePreview ?? "")}
             alt="Uploaded"
           />
           <button

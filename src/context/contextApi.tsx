@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const ContextProvider = ({ children }: ContextProviderType): JSX.Element => {
   const [isCollapse, setIsCollapse] = useState(true);
+  const [globalMessage, setGlobalMessage] = useState<string | null>(null);
   const [cookies, setCookies, removeCookies] = useCookies(["session"]);
   const navigate = useNavigate();
 
@@ -19,7 +20,12 @@ const ContextProvider = ({ children }: ContextProviderType): JSX.Element => {
 
   const removeSession = () => {
     removeCookies("session", { path: "/" });
+    setGlobalMessage(null);
     navigate("/");
+  };
+
+  const sessionExpired = () => {
+    setGlobalMessage("Session Expired");
   };
 
   return (
@@ -30,6 +36,9 @@ const ContextProvider = ({ children }: ContextProviderType): JSX.Element => {
         saveSession,
         session: cookies.session,
         removeSession,
+        sessionExpired,
+        globalMessage,
+        setGlobalMessage,
       }}
     >
       {children}
