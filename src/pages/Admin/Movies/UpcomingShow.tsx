@@ -1,8 +1,7 @@
-import { MdAdd, MdEdit } from "react-icons/md";
+import { MdAdd } from "react-icons/md";
 import Button from "../../../components/buttons/Buttons";
 import AdminContainer from "../../Layout/AdminLayout/AdminContainer";
-import { AiFillDelete } from "react-icons/ai";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import ImageUpload from "../../../components/input/FileInput";
 import FormModal from "../../../components/modals/FormModal";
 import InputField from "../../../components/input/input";
@@ -18,30 +17,14 @@ import {
 import { UserContext } from "../../../context/userContext";
 import toast, { Toaster } from "react-hot-toast";
 import { Option } from "../../../types/AdminTypes/Admin";
-import {
-  MovieRatingsType,
-  ratingsOption,
-  UpcomingGenresType,
-} from "../../../types/movies";
+import { ratingsOption, UpcomingGenresType } from "../../../types/movies";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import CircularProgress from "@mui/material/CircularProgress";
 import { queryClient } from "../../../utils/queryClient";
 import { Pagination } from "@mui/material";
 import { IoIosSearch } from "react-icons/io";
 import Swal from "sweetalert2";
-
-const RatingText = ({ rating }: { rating: MovieRatingsType }) => {
-  const color = {
-    G: "text-green-500",
-    PG: "text-blue-500",
-    SPG: "text-danger",
-  };
-  return (
-    <div className={`flex items-center font-bold ${color[rating]}`}>
-      {rating}
-    </div>
-  );
-};
+import TableRow from "../../../components/Admin/TableRow";
 
 type EditData = {
   id: string;
@@ -79,6 +62,22 @@ const UpcomingShow = () => {
   const OnClickAddNewShow = () => {
     setIsEdit(false);
     setIsShowModal(!isShowModal);
+  };
+
+  const ResetForm = () => {
+    setErrorMessage("");
+    setIsShowModal(false);
+    setImageUpload(null);
+    setSelectedGenre([]);
+    setUploadData({ movie_name: "", mtrcb_rating: "", duration: "" });
+    setEditData({
+      id: "",
+      movie_name: "",
+      mtrcb_rating: "",
+      duration: "",
+      genre: "",
+      image: "",
+    }); // Clear preview on close
   };
 
   // #region REACT QUERY AND MUTATIONS
@@ -199,6 +198,9 @@ const UpcomingShow = () => {
     });
   //#endregion
 
+  const isActionDisabled =
+    isFetching || isSubmitting || isDeleting || isEditing;
+
   const HandleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -276,23 +278,22 @@ const UpcomingShow = () => {
     }
   };
 
-  const HandleDelete = (id: string) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Delete",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteUpcomingMutation(id);
-      }
-    });
-  };
+  const HandleDelete = useCallback(
+    (id: string) => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "This action cannot be undone",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Delete",
+      }).then((result) => {
+        if (result.isConfirmed) deleteUpcomingMutation(id);
+      });
+    },
+    [deleteUpcomingMutation],
+  );
 
-  const HandleEdit = (editData: EditData) => {
+  const HandleEdit = useCallback((editData: EditData) => {
     if (!editData) return;
     const populateSelectedGenre = editData.genre.split(", ").map((genre) => ({
       id: genre,
@@ -300,10 +301,10 @@ const UpcomingShow = () => {
     }));
     setIsShowModal(true);
     setIsEdit(true);
-    setEditData({ ...editData });
+    setEditData(editData);
     setSelectedGenre(populateSelectedGenre);
     setImageUpload(null);
-  };
+  }, []);
 
   return (
     <AdminContainer
@@ -314,7 +315,7 @@ const UpcomingShow = () => {
       <div className="flex h-full flex-col bg-white relative overflow-x-auto sm:rounded-lg border border-neutral-200 shadow">
         <div className="flex justify-end px-3 py-2 items-center w-full">
           <Button
-            disabled={isDeleting || isFetching || isSubmitting || isEditing}
+            disabled={isActionDisabled}
             onClick={OnClickAddNewShow}
             className="flex items-center gap-2-"
           >
@@ -370,50 +371,19 @@ const UpcomingShow = () => {
             </thead>
             <tbody>
               {upcomingMoviesList?.data.map((data) => (
-                <tr
+                <TableRow
                   key={data.id}
-                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                >
-                  <th
-                    scope="row"
-                    className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    <img
-                      className="w-14 object-contain"
-                      src={data.image}
-                      alt={data.movie_name}
-                    />
-                    <div className="ps-3">
-                      <div className="text-base font-semibold">
-                        {data.movie_name}
-                      </div>
-                      <div className="font-normal text-gray-500">
-                        Duration:{" "}
-                        <small className="font-bold">{data.duration}mins</small>
-                      </div>
-                    </div>
-                  </th>
-                  <td className="px-6 py-4">{data.genre}</td>
-                  <td className="px-6 py-4">
-                    <RatingText rating={data.mtrcb_rating} />
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() => HandleEdit(data)}
-                      disabled={isDeleting}
-                      className="px-2 py-1 bg-blue-700 text-white rounded hover:bg-blue-800 mr-1 font-bold disabled:bg-blue-300"
-                    >
-                      <MdEdit size={20} />
-                    </button>
-                    <button
-                      disabled={isDeleting}
-                      onClick={() => HandleDelete(data.id)}
-                      className="px-2 py-1 bg-red-700 text-white rounded hover:bg-red-800 mr-1 font-bold disabled:bg-red-300"
-                    >
-                      <AiFillDelete size={20} />
-                    </button>
-                  </td>
-                </tr>
+                  id={data.id}
+                  movie_name={data.movie_name}
+                  image={data.image}
+                  mtrcb_rating={"PG"}
+                  genre={data.genre}
+                  duration={data.duration}
+                  created_at={data.created_at}
+                  isDeleting={isDeleting}
+                  HandleEdit={HandleEdit}
+                  HandleDelete={HandleDelete}
+                />
               ))}
             </tbody>
           </table>
@@ -421,8 +391,8 @@ const UpcomingShow = () => {
 
         <div className="flex items-center justify-end p-2 mt-auto">
           <Pagination
-            disabled={isFetching || isSubmitting || isDeleting || isEditing}
-            count={upcomingMoviesList?.totalPages ?? 0}
+            disabled={isActionDisabled}
+            count={upcomingMoviesList?.totalPages || 0}
             page={currentPage}
             onChange={(_e, page) => {
               setCurrentPage(page);
@@ -436,15 +406,7 @@ const UpcomingShow = () => {
       {isShowModal && (
         <FormModal
           onSubmit={HandleSubmit}
-          onClose={() => {
-            if (isSubmitting || isEditing) return;
-            setErrorMessage("");
-            setIsShowModal(false);
-            setImageUpload(null);
-            setSelectedGenre([]);
-            setUploadData({ movie_name: "", mtrcb_rating: "", duration: "" });
-            setEditData((prev) => ({ ...prev, image: "" })); // Clear preview on close
-          }}
+          onClose={ResetForm}
           title="Add new show"
           errorMessage={errorMessage}
           isLoading={isSubmitting || isEditing}
