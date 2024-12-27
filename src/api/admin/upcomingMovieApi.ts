@@ -116,3 +116,30 @@ export const EditUpcomingMovieApi = async (props: RequestApi) => {
     throw error;
   }
 };
+
+export const TransferNowShowingApi = async (props: RequestApi) => {
+  const { signal, data } = props;
+  const axiosInstance = AxiosInstance(props);
+
+  try {
+    const response = await axiosInstance.post(
+      `${BASE_URL}/api/movetonowshowing`,
+      data,
+      {
+        signal,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.error("Request canceled", error.message);
+    } else if (axios.isAxiosError(error)) {
+      if (error.response?.data && error.response.data.isToken) {
+        props.onTokenExpired();
+      }
+    } else {
+      console.error("Unexpected error:", error);
+    }
+    throw error;
+  }
+};

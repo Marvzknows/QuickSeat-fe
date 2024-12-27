@@ -19,6 +19,8 @@ type TableRowProps = MoviesType & {
   HandleEdit: (data: MoviesType) => void;
   HandleDelete: (id: string) => void;
   isDeleting: boolean;
+  HandleCheckBox: (id: string) => void;
+  checkedData: string[];
 };
 
 const TableRow = (props: TableRowProps) => {
@@ -27,7 +29,15 @@ const TableRow = (props: TableRowProps) => {
       key={props.id}
       className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
     >
-      <th
+      <td className="text-center">
+        <input
+          onChange={() => props.HandleCheckBox(props.id)}
+          checked={props.checkedData.includes(props.id)}
+          type="checkbox"
+          className="cursor-pointer h-4 w-4 text-blue-600"
+        />
+      </td>
+      <td
         scope="row"
         className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
       >
@@ -42,7 +52,7 @@ const TableRow = (props: TableRowProps) => {
             Duration: <small className="font-bold">{props.duration}mins</small>
           </div>
         </div>
-      </th>
+      </td>
       <td className="px-6 py-4">{props.genre}</td>
       <td className="px-6 py-4">
         <RatingText rating={props.mtrcb_rating} />
