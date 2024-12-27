@@ -13,6 +13,7 @@ import {
   EditUpcomingMovieApi,
   GetGenresListApi,
   GetUpcomingMoviesListApi,
+  TransferNowShowingApi,
 } from "../../../api/admin/upcomingMovieApi";
 import { UserContext } from "../../../context/userContext";
 import toast, { Toaster } from "react-hot-toast";
@@ -58,6 +59,8 @@ const UpcomingShow = () => {
     genre: "",
     image: "",
   });
+
+  const [checkedData, setCheckedData] = useState<string[]>([]);
 
   const OnClickAddNewShow = () => {
     setIsEdit(false);
@@ -196,10 +199,30 @@ const UpcomingShow = () => {
       },
       onError: (err) => toast.error(`Error deleting movie: ${err}`),
     });
+
+  // Add Now showing
+  const { mutateAsync: transferNowShowingMutation, isPending: isTransfering } =
+    useMutation({
+      mutationFn: async (data: string[]) => {
+        await TransferNowShowingApi({
+          token: context.session?.acces_token ?? "",
+          onTokenExpired: context.sessionExpired,
+          data: {
+            movieIds: data,
+          },
+        });
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["upcomingMovies"] });
+        setCheckedData([]);
+        toast.success("Movie successfully transfered to now showing");
+      },
+      onError: (err) => toast.error(`Error deleting movie: ${err}`),
+    });
   //#endregion
 
   const isActionDisabled =
-    isFetching || isSubmitting || isDeleting || isEditing;
+    isFetching || isSubmitting || isDeleting || isEditing || isTransfering;
 
   const HandleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -306,6 +329,30 @@ const UpcomingShow = () => {
     setImageUpload(null);
   }, []);
 
+  const HandleCheckBox = (id: string) => {
+    if (!id) return;
+    setCheckedData((prev) =>
+      prev.includes(id)
+        ? prev.filter((checkedId) => checkedId !== id)
+        : [...prev, id],
+    );
+  };
+
+  const HandleUploadNowShowing = () => {
+    if (!checkedData.length) return;
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Move this movie into now showing?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        transferNowShowingMutation(checkedData);
+      }
+    });
+  };
+
   return (
     <AdminContainer
       className="overflow-auto"
@@ -313,11 +360,19 @@ const UpcomingShow = () => {
       sectionHeaderCurrentPage={"Upcoming show"}
     >
       <div className="flex h-full flex-col bg-white relative overflow-x-auto sm:rounded-lg border border-neutral-200 shadow">
-        <div className="flex justify-end px-3 py-2 items-center w-full">
+        <div className="flex justify-end gap-1 px-3 py-4 items-center w-full">
+          <Button
+            disabled={isActionDisabled || !checkedData.length}
+            variant="outline"
+            onClick={HandleUploadNowShowing}
+            className="flex items-center gap-2"
+          >
+            <MdAdd size={18} /> Transfer to Now showing
+          </Button>
           <Button
             disabled={isActionDisabled}
             onClick={OnClickAddNewShow}
-            className="flex items-center gap-2-"
+            className="flex items-center gap-2"
           >
             <MdAdd size={18} /> Add New Show
           </Button>
@@ -356,6 +411,9 @@ const UpcomingShow = () => {
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>
                 <th scope="col" className="px-6 py-3">
+                  {/* checkbox */}
+                </th>
+                <th scope="col" className="px-6 py-3">
                   Movie Name
                 </th>
                 <th scope="col" className="px-6 py-3">
@@ -376,13 +434,15 @@ const UpcomingShow = () => {
                   id={data.id}
                   movie_name={data.movie_name}
                   image={data.image}
-                  mtrcb_rating={"PG"}
+                  mtrcb_rating={data.mtrcb_rating}
                   genre={data.genre}
                   duration={data.duration}
                   created_at={data.created_at}
                   isDeleting={isDeleting}
+                  checkedData={checkedData}
                   HandleEdit={HandleEdit}
                   HandleDelete={HandleDelete}
+                  HandleCheckBox={HandleCheckBox}
                 />
               ))}
             </tbody>
@@ -411,7 +471,7 @@ const UpcomingShow = () => {
           errorMessage={errorMessage}
           isLoading={isSubmitting || isEditing}
         >
-          <div className="flex flex-col w-full  border-danger">
+          <div className="flex flex-col w-full">
             <ImageUpload
               name="image"
               id="image"
