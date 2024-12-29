@@ -345,7 +345,7 @@ const UpcomingShow = () => {
       text: "Move this movie into now showing?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Delete",
+      confirmButtonText: "Yes",
     }).then((result) => {
       if (result.isConfirmed) {
         transferNowShowingMutation(checkedData);
