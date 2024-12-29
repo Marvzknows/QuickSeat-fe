@@ -423,6 +423,9 @@ const UpcomingShow = () => {
                   Rating
                 </th>
                 <th scope="col" className="px-6 py-3">
+                  TICKET PRICE
+                </th>
+                <th scope="col" className="px-6 py-3">
                   Action
                 </th>
               </tr>
@@ -438,6 +441,7 @@ const UpcomingShow = () => {
                   genre={data.genre}
                   duration={data.duration}
                   created_at={data.created_at}
+                  ticket_price={0}
                   isDeleting={isDeleting}
                   checkedData={checkedData}
                   HandleEdit={HandleEdit}

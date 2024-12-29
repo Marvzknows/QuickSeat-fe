@@ -123,6 +123,7 @@ const AdminDashboard = () => {
                     upcomingMoviesList.data.map((item) => (
                       <DbMovieList
                         key={item.id}
+                        ticket_price={item.ticket_price}
                         id={item.id}
                         movie_name={item.movie_name}
                         image={item.image}
@@ -148,6 +149,7 @@ const AdminDashboard = () => {
                     NowShowingMoviesList.data.map((item) => (
                       <DbMovieList
                         key={item.id}
+                        ticket_price={item.ticket_price}
                         id={item.id}
                         movie_name={item.movie_name}
                         image={item.image}
