@@ -25,8 +25,8 @@ COLOR PALLETE THEME: https://colorhunt.co/palette/040d12183d3d5c837493b1a6
 - Responsiveness
 
 ======= ADJUSTMENT ========
-- add "ticket_price" input field for adding upcoming movie ( FRONTEND and BACKEND )
-- add column for the following: ( BACKEND )
+- **DONE** add "ticket_price" input field for adding upcoming movie ( FRONTEND and BACKEND )
+- **DONE** add column for the following: ( BACKEND )
     -> ticket_sold: NUMBER
 
 

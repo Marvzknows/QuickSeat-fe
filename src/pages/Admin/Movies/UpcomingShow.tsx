@@ -34,6 +34,7 @@ type EditData = {
   duration: string;
   genre: string;
   image: string;
+  ticket_price: number;
 };
 
 const UpcomingShow = () => {
@@ -44,6 +45,7 @@ const UpcomingShow = () => {
     movie_name: "",
     mtrcb_rating: "",
     duration: "",
+    ticket_price: 0,
   });
   const [errorMessage, setErrorMessage] = useState("");
   const context = useContext(UserContext);
@@ -58,6 +60,7 @@ const UpcomingShow = () => {
     duration: "",
     genre: "",
     image: "",
+    ticket_price: 0,
   });
 
   const [checkedData, setCheckedData] = useState<string[]>([]);
@@ -72,7 +75,12 @@ const UpcomingShow = () => {
     setIsShowModal(false);
     setImageUpload(null);
     setSelectedGenre([]);
-    setUploadData({ movie_name: "", mtrcb_rating: "", duration: "" });
+    setUploadData({
+      movie_name: "",
+      mtrcb_rating: "",
+      duration: "",
+      ticket_price: 0,
+    });
     setEditData({
       id: "",
       movie_name: "",
@@ -80,6 +88,7 @@ const UpcomingShow = () => {
       duration: "",
       genre: "",
       image: "",
+      ticket_price: 0,
     }); // Clear preview on close
   };
 
@@ -140,6 +149,7 @@ const UpcomingShow = () => {
           movie_name: "",
           mtrcb_rating: "",
           duration: "",
+          ticket_price: 0,
         });
         setSelectedGenre([]);
         setErrorMessage("");
@@ -173,6 +183,7 @@ const UpcomingShow = () => {
           duration: "",
           genre: "",
           image: "",
+          ticket_price: 0,
         });
         setSelectedGenre([]);
         setErrorMessage("");
@@ -228,11 +239,17 @@ const UpcomingShow = () => {
     e.preventDefault();
 
     const data = isEdit ? editData : uploadData;
-    const { movie_name, mtrcb_rating, duration } = data;
+    const { movie_name, mtrcb_rating, duration, ticket_price } = data;
 
     if (!context.session) return;
 
-    if (!selectedGenre || !movie_name || !mtrcb_rating || !duration) {
+    if (
+      !selectedGenre ||
+      !movie_name ||
+      !mtrcb_rating ||
+      !duration ||
+      ticket_price <= 0
+    ) {
       setErrorMessage("All Fields are Required");
       return;
     }
@@ -259,6 +276,7 @@ const UpcomingShow = () => {
     formData.append("mtrcb_rating", mtrcb_rating);
     formData.append("genre", splitGenre);
     formData.append("duration", duration);
+    formData.append("ticket_price", ticket_price.toString());
 
     if (isEdit) {
       await editUpcomingMutation(formData);
@@ -293,6 +311,9 @@ const UpcomingShow = () => {
       setSearch(value);
       setCurrentPage(1);
     }
+
+    if ((name === "ticket_price" || name === "duration") && Number(value) < 0)
+      return;
 
     if (isEdit) {
       setEditData((prev) => ({ ...prev, [name]: value }));
@@ -441,7 +462,7 @@ const UpcomingShow = () => {
                   genre={data.genre}
                   duration={data.duration}
                   created_at={data.created_at}
-                  ticket_price={0}
+                  ticket_price={data.ticket_price}
                   isDeleting={isDeleting}
                   checkedData={checkedData}
                   HandleEdit={HandleEdit}
@@ -508,6 +529,8 @@ const UpcomingShow = () => {
                 value={isEdit ? editData.mtrcb_rating : uploadData.mtrcb_rating}
                 className="w-full"
               />
+            </div>
+            <div className="flex flex-col md:flex-row items-center">
               <InputField
                 name="duration"
                 id="duration"
@@ -515,6 +538,15 @@ const UpcomingShow = () => {
                 label="Movie Duration"
                 type="number"
                 value={isEdit ? editData.duration : uploadData.duration}
+                onChange={HandleOnchange}
+              />
+              <InputField
+                name="ticket_price"
+                id="ticket_price"
+                className="w-full"
+                label="Tciket Price"
+                type="number"
+                value={isEdit ? editData.ticket_price : uploadData.ticket_price}
                 onChange={HandleOnchange}
               />
             </div>

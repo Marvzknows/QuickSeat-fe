@@ -81,5 +81,4 @@ const TableRow = (props: TableRowProps) => {
   );
 };
 
-// export default memo(TableRow);
 export default TableRow;
