@@ -1,1 +1,1 @@
-export const BASE_URL = `http://localhost:5000`; // transfer this in the ENV file
+export const BASE_URL = import.meta.env.BASE_URL;
