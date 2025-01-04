@@ -40,11 +40,11 @@ const ImageUpload = ({
   };
 
   return (
-    <div className="flex items-center justify-center h-72 w-64 border-2 border-dashed border-gray-300 rounded-lg mx-auto">
+    <div className="flex items-center justify-center min-h-72 w-64 border-2 border-dashed border-gray-300 rounded-lg mx-auto">
       {imagePreview || propsImagePreview ? (
         <div className="relative w-full h-full">
           <img
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full"
             src={(propsImagePreview ?? "") || (imagePreview ?? "")}
             alt="Uploaded"
           />

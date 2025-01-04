@@ -3,6 +3,7 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import { MovieRatingsType } from "../../types/movies";
 
 interface MovieCardProps {
+  id: string;
   title: string;
   price: number;
   ticketsSold: number;
@@ -10,7 +11,7 @@ interface MovieCardProps {
   duration: string;
   imageUrl: string;
   onEdit: () => void;
-  onDelete: () => void;
+  onDelete: (id: string) => void;
 }
 
 const CardBadge = ({ rating }: { rating: MovieRatingsType }) => {
@@ -30,6 +31,7 @@ const CardBadge = ({ rating }: { rating: MovieRatingsType }) => {
 };
 
 const NowShowingMovieCard: React.FC<MovieCardProps> = ({
+  id,
   title,
   price,
   ticketsSold,
@@ -62,7 +64,7 @@ const NowShowingMovieCard: React.FC<MovieCardProps> = ({
             <FaEdit className="mr-1" /> Edit
           </button>
           <button
-            onClick={onDelete}
+            onClick={() => onDelete(id)}
             className="flex items-center text-red-400 hover:text-red-300"
           >
             <FaTrash className="mr-1" /> Delete
