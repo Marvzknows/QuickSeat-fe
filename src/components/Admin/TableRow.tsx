@@ -1,6 +1,7 @@
 import { MdEdit } from "react-icons/md";
 import { MovieRatingsType, MoviesType } from "../../types/movies";
 import { AiFillDelete } from "react-icons/ai";
+import { ParseToPhp } from "../../utils/ParseToPhp";
 
 const RatingText = ({ rating }: { rating: MovieRatingsType }) => {
   const color = {
@@ -57,6 +58,9 @@ const TableRow = (props: TableRowProps) => {
       <td className="px-6 py-4">
         <RatingText rating={props.mtrcb_rating} />
       </td>
+      <td className="px-6 py-4 font-semibold">
+        {ParseToPhp(props.ticket_price)}
+      </td>
       <td className="px-6 py-4">
         <button
           onClick={() => props.HandleEdit(props)}
@@ -77,5 +81,4 @@ const TableRow = (props: TableRowProps) => {
   );
 };
 
-// export default memo(TableRow);
 export default TableRow;

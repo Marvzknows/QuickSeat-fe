@@ -16,17 +16,26 @@ COLOR PALLETE THEME: https://colorhunt.co/palette/040d12183d3d5c837493b1a6
 == TASK ==
 
 - **DONE** Login Page ( UI and Functionality )
-- Handling Access token (React cookie)
 - Install and setup Redux
-- Implement Protected Routes
 - Admin Dashboard
     -> **DONE** Side bar (Submenu toggle)
     -> **DONE** Toggle Sidebar
     -> **DONE** Main bar
 
 - Responsiveness
-- custom hook for toggle dropdowns
 
-- create ENV file for backend API BaseURL
-- Create formal error response modal if session expired (redirect or force logout if expired)
-- **DONE** Implement tanstach/react query
+======= ADJUSTMENT ========
+- **DONE** add "ticket_price" input field for adding upcoming movie ( FRONTEND and BACKEND )
+- **DONE** add column for the following: ( BACKEND )
+    -> ticket_sold: NUMBER
+
+
+
+========== NOW SHOWING TODO =========
+
+- Now showing Cards ( not table )
+    -> Contents: [Movie name, Price, ticket Sold, Rating, Duration,]
+    -> action buttons: delete, edit
+
+- Search bar 
+    -> search bar in top (movie name)

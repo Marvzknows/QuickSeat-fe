@@ -1,4 +1,5 @@
 import { MovieRatingsType, MoviesType } from "../../types/movies";
+import { ParseToPhp } from "../../utils/ParseToPhp";
 
 type DbMovieListProps = MoviesType;
 
@@ -29,8 +30,10 @@ const DbMovieList = (props: DbMovieListProps) => {
       </div>
       <div className="ml-auto my-auto pr-4">
         <p className="text-slate-500">
-          Ticket Sold:
-          <span className="text-slate-800 font-bold px-1">₱1,400.00</span>
+          Ticket Price:
+          <span className="text-slate-800 font-bold px-1">
+            {ParseToPhp(props.ticket_price)}
+          </span>
         </p>
       </div>
     </div>

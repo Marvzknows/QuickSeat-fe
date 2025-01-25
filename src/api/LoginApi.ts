@@ -7,7 +7,7 @@ export const LoginApi = async (props: RequestApi) => {
   const axiosInstance = AxiosInstance(props);
 
   try {
-    const response = await axiosInstance.post(`${BASE_URL}/api/login`, {
+    const response = await axiosInstance.post(`${BASE_URL}/api/logissn`, {
       data: props.data,
     });
     return response.data;

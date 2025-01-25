@@ -24,6 +24,7 @@ export type MoviesType = {
   genre: string;
   duration: string;
   created_at: string;
+  ticket_price: number;
 };
 
 export type UpcomingGenresType = {
