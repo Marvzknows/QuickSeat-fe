@@ -5,7 +5,6 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import ImageUpload from "../../../components/input/FileInput";
 import FormModal from "../../../components/modals/FormModal";
 import InputField from "../../../components/input/input";
-import MultiSelectDropdown from "../../../components/dropdown/MultiSelect";
 import SelectDropdown from "../../../components/dropdown/SelectDropdown";
 import {
   AddUpcommingApi,
@@ -26,6 +25,7 @@ import { Pagination } from "@mui/material";
 import { IoIosSearch } from "react-icons/io";
 import Swal from "sweetalert2";
 import TableRow from "../../../components/Admin/TableRow";
+import MultiSelect from "../../../components/dropdown/MultiSelect";
 
 type EditData = {
   id: string;
@@ -264,7 +264,6 @@ const UpcomingShow = () => {
 
     // Only append image if imageUpload is not null
     if (!isEdit && !imageUpload) {
-      console.log("not edit");
       setErrorMessage("Movie Poster is required");
       return;
     }
@@ -515,7 +514,7 @@ const UpcomingShow = () => {
               onChange={HandleOnchange}
             />
             <div className="flex flex-col md:flex-row items-center">
-              <MultiSelectDropdown
+              <MultiSelect
                 label="Genre"
                 options={options}
                 value={selectedGenre}

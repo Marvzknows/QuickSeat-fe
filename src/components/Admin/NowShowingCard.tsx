@@ -1,8 +1,9 @@
 import React from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { MovieRatingsType } from "../../types/movies";
+import { EditData } from "../../pages/Admin/Movies/NowShowing";
 
-interface MovieCardProps {
+type MovieCardProps = {
   id: string;
   title: string;
   price: number;
@@ -10,9 +11,10 @@ interface MovieCardProps {
   rating: string;
   duration: string;
   imageUrl: string;
-  onEdit: () => void;
+  genre: string;
+  onEdit: (data: EditData) => void;
   onDelete: (id: string) => void;
-}
+};
 
 const CardBadge = ({ rating }: { rating: MovieRatingsType }) => {
   const variant = {
@@ -30,17 +32,18 @@ const CardBadge = ({ rating }: { rating: MovieRatingsType }) => {
   );
 };
 
-const NowShowingMovieCard: React.FC<MovieCardProps> = ({
-  id,
-  title,
-  price,
-  ticketsSold,
-  rating,
-  duration,
-  imageUrl,
-  onEdit,
-  onDelete,
-}) => {
+const NowShowingMovieCard: React.FC<MovieCardProps> = (props) => {
+  const {
+    id,
+    title,
+    price,
+    ticketsSold,
+    rating,
+    duration,
+    imageUrl,
+    onEdit,
+    onDelete,
+  } = props;
   return (
     <figure className="bg-[#eaeded] border border-slate-200 text-white rounded-lg shadow-lg overflow-hidden w-full md:w-[320px] lg:w-[280px]">
       <div className="relative w-[95%] h-96 mx-auto mt-2 rounded-md overflow-hidden">
@@ -58,7 +61,7 @@ const NowShowingMovieCard: React.FC<MovieCardProps> = ({
         <p className="text-gray-800">Tickets Sold: {ticketsSold}</p>
         <div className="flex justify-between mt-4">
           <button
-            onClick={onEdit}
+            onClick={() => onEdit(props)}
             className="flex items-center text-blue-400 hover:text-blue-300"
           >
             <FaEdit className="mr-1" /> Edit

@@ -2,15 +2,49 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import NowShowingMovieCard from "../../../components/Admin/NowShowingCard";
 import AdminContainer from "../../Layout/AdminLayout/AdminContainer";
 import { GetNowShowingMoviesListApi } from "../../../api/admin/AdminDashboardApi";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { UserContext } from "../../../context/userContext";
 import { CircularProgress } from "@mui/material";
-import { DeleteNowShowingApi } from "../../../api/admin/NowShowingApi";
+import {
+  DeleteNowShowingApi,
+  EditNowShowingApi,
+} from "../../../api/admin/NowShowingApi";
 import { queryClient } from "../../../utils/queryClient";
 import Swal from "sweetalert2";
+import FormModal from "../../../components/modals/FormModal";
+import ImageUpload from "../../../components/input/FileInput";
+import InputField from "../../../components/input/input";
+import SelectDropdown from "../../../components/dropdown/SelectDropdown";
+import MultiSelect from "../../../components/dropdown/MultiSelect";
+import { Option } from "../../../types/AdminTypes/Admin";
+import { ratingsOption, UpcomingGenresType } from "../../../types/movies";
+import { GetGenresListApi } from "../../../api/admin/upcomingMovieApi";
+import toast, { Toaster } from "react-hot-toast";
+
+export type EditData = {
+  id: string;
+  title: string;
+  price: number;
+  rating: string;
+  duration: string;
+  imageUrl: string;
+  genre: string;
+};
 
 const NowShowing = () => {
   const context = useContext(UserContext);
+  const [selectedGenre, setSelectedGenre] = useState<Option[]>([]); // split when passing as payload
+  const [showModal, setShowModal] = useState(false);
+  const [imageUpload, setImageUpload] = useState<File | null>(null);
+  const [editData, setEditData] = useState<EditData>({
+    id: "",
+    title: "",
+    price: 0,
+    rating: "",
+    duration: "",
+    imageUrl: "",
+    genre: "",
+  });
 
   //#region tanstack query
   const {
@@ -43,6 +77,49 @@ const NowShowing = () => {
       });
     },
   });
+
+  // Fetch Movie Genres
+  const { data: genreList } = useQuery<UpcomingGenresType>({
+    queryKey: ["options"],
+    queryFn: () =>
+      GetGenresListApi({
+        token: context.session?.acces_token ?? "",
+        onTokenExpired: context.sessionExpired,
+      }),
+  });
+
+  // Edit Now Showing Movie
+  const { mutateAsync: editNowShowing, isPending: isEditing } = useMutation({
+    mutationFn: async (formData: FormData) => {
+      await EditNowShowingApi({
+        token: context.session?.acces_token ?? "",
+        data: formData,
+        onTokenExpired: context.sessionExpired,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["nowShowingMovies"],
+      });
+
+      setShowModal(false);
+      setEditData({
+        id: "",
+        title: "",
+        price: 0,
+        rating: "",
+        duration: "",
+        imageUrl: "",
+        genre: "",
+      });
+      setSelectedGenre([]);
+      // setErrorMessage("");
+      toast.success("Successfully modified upcoming movie");
+    },
+    onError: (err) => {
+      toast.success(`${err}: Error editing upcoming movie`);
+    },
+  });
   //#endregion
 
   const onDelete = async (id: string) => {
@@ -57,6 +134,63 @@ const NowShowing = () => {
     if (result.isConfirmed) {
       await deleteNowShowing(id);
     }
+  };
+
+  const HandleEdit = (editData: EditData) => {
+    if (!editData) return;
+    const populateSelectedGenre = editData.genre.split(", ").map((genre) => ({
+      id: genre,
+      name: genre,
+    }));
+    setShowModal(true);
+    setEditData(editData);
+    setSelectedGenre(populateSelectedGenre);
+  };
+
+  const HandleSelectGenre = (option: Option) => {
+    setSelectedGenre((prev) => {
+      // Check if the option is already selected
+      if (prev.some((selected) => selected.id === option.id)) {
+        // Remove the option if already selected
+        return prev.filter((selected) => selected.id !== option.id);
+      } else {
+        // Add the option if not already selected
+        return [...prev, option];
+      }
+    });
+  };
+
+  const HandleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const HandleOnchangeSelect = (option: Option) => {
+    setEditData((prev) => ({ ...prev, rating: option.name }));
+  };
+
+  const HandleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { id, title, price, rating, duration } = editData;
+    const splitGenre = selectedGenre.map((data) => data.name).join(", "); // split when passing as payload
+
+    console.table(editData);
+    console.log(selectedGenre);
+
+    const formData = new FormData();
+
+    if (imageUpload) {
+      formData.append("image", imageUpload);
+    }
+
+    formData.append("id", id);
+    formData.append("movie_name", title);
+    formData.append("mtrcb_rating", rating);
+    formData.append("genre", splitGenre);
+    formData.append("duration", duration);
+    formData.append("price", price.toString());
+
+    await editNowShowing(formData);
   };
 
   return (
@@ -85,10 +219,9 @@ const NowShowing = () => {
                   ticketsSold={4124}
                   rating={data.mtrcb_rating}
                   duration={data.duration}
+                  genre={data.genre}
                   imageUrl={data.image}
-                  onEdit={() => {
-                    throw new Error("Function not implemented.");
-                  }}
+                  onEdit={HandleEdit}
                   onDelete={onDelete}
                 />
               ))
@@ -100,6 +233,73 @@ const NowShowing = () => {
           </div>
         </div>
       </div>
+
+      {showModal && (
+        <FormModal
+          onClose={() => setShowModal(false)}
+          title={"Edit Now Showing Movie"}
+          onSubmit={HandleSubmit}
+          isLoading={isEditing}
+          errorMessage={""}
+        >
+          <div className="flex flex-col w-full">
+            <ImageUpload
+              name="image"
+              id="image"
+              setImageUpload={setImageUpload}
+              propsImagePreview={editData.imageUrl ?? null}
+              removePropsImagePreview={() =>
+                setEditData((prev) => ({ ...prev, imageUrl: "" }))
+              }
+            />
+            <InputField
+              name="title"
+              id="title"
+              className="mt-5"
+              label="Movie name"
+              value={editData.title}
+              onChange={HandleOnchange}
+            />
+            <div className="flex flex-col md:flex-row items-center">
+              <MultiSelect
+                label="Genre"
+                options={(genreList?.data as Option[]) || []}
+                value={selectedGenre}
+                onChange={HandleSelectGenre}
+                className="w-full"
+              />
+              <SelectDropdown
+                handleOnchange={HandleOnchangeSelect}
+                label="Rating"
+                options={ratingsOption}
+                value={editData.rating}
+                className="w-full"
+              />
+            </div>
+            <div className="flex flex-col md:flex-row items-center">
+              <InputField
+                name="duration"
+                id="duration"
+                className="w-full"
+                label="Movie Duration"
+                type="number"
+                value={editData.duration}
+                onChange={HandleOnchange}
+              />
+              <InputField
+                name="price"
+                id="price"
+                className="w-full"
+                label="Tciket Price"
+                type="number"
+                value={editData.price}
+                onChange={HandleOnchange}
+              />
+            </div>
+          </div>
+        </FormModal>
+      )}
+      <Toaster position="top-center" reverseOrder={false} />
     </AdminContainer>
   );
 };

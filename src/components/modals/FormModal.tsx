@@ -80,6 +80,7 @@ const FormModal = ({
               className="px-5"
               variant="outline"
               onClick={onClose}
+              disabled={isLoading}
             >
               Close
             </Button>
